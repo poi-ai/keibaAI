@@ -1,3 +1,4 @@
+import log
 import os
 import sys
 
@@ -8,7 +9,8 @@ def main():
     try:
         import settings
     except ModuleNotFoundError as e:
-        print('[Error]settings.pyが見つかりません\nリポジトリのルートディレクトリ直下にsettings.pyを配置してください')
+        logger.error('settings.pyが見つかりません。リポジトリのルートディレクトリ直下にsettings.pyを配置してください')
+        return
 
     # 共通用ディレクトリをモジュールパスに追加
     # README.mdの「共通用ディレクトリをモジュールパスに追加する」を実行していた場合はなくてもよい
@@ -45,9 +47,11 @@ def main():
 def validate_error(variable, unavailable = None):
     '''設定ファイルのパラメータに誤りがあった場合'''
     if unavailable == None:
-        print(f'settings.pyの{variable}の値が正しくありません\n再度パラメータを確認してください')
+        logger.error(f'settings.pyの{variable}の値が正しくありません。再度パラメータを確認してください')
     else:
-        print(f'settings.pyの{variable}に{unavailable}は現在設定できません\n別の値を設定してください')
+        logger.error(f'settings.pyの{variable}に{unavailable}は現在設定できません。別の値を設定してください')
+    exit()
 
 if __name__ == '__main__':
+    logger = log.Logger()
     main()
