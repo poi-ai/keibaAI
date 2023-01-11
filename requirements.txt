@@ -2,6 +2,7 @@
 certifi==2022.12.7
 charset-normalizer==2.1.1
 colorama==0.4.6
+html5lib==1.1
 idna==3.4
 lxml==4.9.2
 numpy==1.24.1
