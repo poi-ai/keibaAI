@@ -10,7 +10,7 @@ def half_to_full(word):
 
 def rm(str):
     '''改行・空白を除去'''
-    return str.replace('\n', '').replace('\r', '').replace('\xa0', '').replace(' ', '')
+    return str.replace('\n', '').replace('\r', '').replace('\xa0', '').replace(' ', '').replace('　', '')
 
 def rm_charcode(str):
     '''文字コードを除去'''
