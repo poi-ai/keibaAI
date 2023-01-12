@@ -36,6 +36,16 @@ def main():
                 pass
             else:
                 validate_error('DATA_TIME')
+        elif settings.DATA_TYPE == 'horse':
+            # フォルダ読み込み
+            from src.scraping.jbis import horse
+            # インスタンス生成
+            h = horse.Horse(settings.JBIS_HORSE_ID)
+            # 失敗したら終了
+            if not h:
+                return
+            # 主処理
+            h.main()
         else:
             validate_error('DATA_TYPE')
     elif settings.SCRIPT_TYPE == 'analysis':
