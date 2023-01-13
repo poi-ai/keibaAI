@@ -65,7 +65,7 @@ $ pip install -r requirements.txt
 #### Windows
 
 ##### 画面から設定
-検索ボックスでenvと入力→「システム環境変数の編集」→「環境変数(N)」→「PYTHONPATH」の変数値に`<ローカルリポジトリのパス>\src\common`を追加
+検索ボックスでenvと入力→「システム環境変数の編集」→「環境変数(N)」→「PYTHONPATH」の変数値に`<ローカルリポジトリのパス>\src\common;<ローカルリポジトリのパス>\config`を追加
 
 ##### プロンプトから設定
 
@@ -78,13 +78,13 @@ $ echo %PYTHONPATH%
 `%PYTHONPATH%`と出力されたら、
 
 ```
-$ setx /m PYTHONPATH "<ローカルリポジトリのパス>\src\common"
+$ setx /m PYTHONPATH "<ローカルリポジトリのパス>\src\common;<ローカルリポジトリのパス>\config"
 ```
 
 何かしらのパスが出力されたら、
 
 ```
-$ setx /m PYTHONPATH "%PYTHONPATH%;<ローカルリポジトリのパス>\src\common"
+$ setx /m PYTHONPATH "%PYTHONPATH%;<ローカルリポジトリのパス>\src\common;<ローカルリポジトリのパス>\config"
 ```
 
 を実行する
@@ -100,13 +100,13 @@ $ printenv PYTHONPATH
 何も出力されなかったら、
 
 ```
-$ export PYTHONPATH=<ローカルリポジトリのパス>/src/common
+$ export PYTHONPATH=<ローカルリポジトリのパス>/src/common:<ローカルリポジトリのパス>/config
 ```
 
 何かしらのパスが出力されたら、
 
 ```
-$ export PYTHONPATH=$PYTHONPATH:<ローカルリポジトリのパス>/src/common
+$ export PYTHONPATH=$PYTHONPATH:<ローカルリポジトリのパス>/src/common:<ローカルリポジトリのパス>/config
 ```
 
 を実行する
@@ -114,7 +114,7 @@ $ export PYTHONPATH=$PYTHONPATH:<ローカルリポジトリのパス>/src/commo
 <a id="anchor4"></a>
 ## 4. 実行
 
-`<ローカルリポジトリのパス>/src/settings.py`へ起動させるシステムや設定ファイルを記載した後に、
+`<ローカルリポジトリのパス>/src/config.py`へ起動させるシステムや設定ファイルを記載した後に、
 
 ```
 $ cd <ローカルリポジトリのパス>

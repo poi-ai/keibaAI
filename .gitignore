@@ -5,4 +5,4 @@
 *.pyc
 *.log
 line_token.txt
-settings.py
+*/settings.py

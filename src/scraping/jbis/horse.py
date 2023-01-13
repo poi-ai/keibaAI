@@ -1,34 +1,45 @@
+import base
 import gethtml
-import log
 import mold
 import re
+import traceback
 
-class Horse:
+class Horse(base.Base):
     def __init__(self, horse_id):
         self.horse_id = horse_id
 
     def main(self):
         '''主処理'''
+
         # HTML取得
-        soup = gethtml.soup(f'https://www.jbis.or.jp/horse/{self.horse_id}/')
+        try:
+            soup = gethtml.soup(f'https://www.jbis.or.jp/horse/{self.horse_id}/')
+        except Exception as e:
+            self.error_output('競走馬ページ取得取得処理でエラー', e, traceback.format_exc())
+            return
+
+        # TODO 存在しないページチェック
 
         # 馬名/生産国情報取得
         try:
             self.get_horse_name(soup)
         except Exception as e:
-            pass
+            self.error_output('馬名/生産国情報取得処理でエラー', e, traceback.format_exc())
+            return
 
         # プロフィール情報取得
         try:
             self.get_profile(soup)
         except Exception as e:
-            pass
+            self.error_output('プロフィール情報取得処理でエラー', e, traceback.format_exc())
+            return
 
         # 血統情報取得
         try:
             self.get_blood(soup)
         except Exception as e:
-            pass
+            self.error_output('血統情報取得処理でエラー', e, traceback.format_exc())
+            return
 
     def get_horse_name(self, soup):
         '''馬名と生産国を取得する'''
@@ -55,17 +66,17 @@ class Horse:
 
         # 取得失敗時のログ出力
         if len(profile_table) == 0:
-            logger.error('プロフィールテーブルが見つかりません')
+            self.logger.error('プロフィールテーブルが見つかりません')
             return
         elif len(profile_table) > 1:
-            logger.warning('プロフィールテーブルが複数見つかりました。一番上のテーブルを取得対象にします')
+            self.logger.warning('プロフィールテーブルが複数見つかりました。一番上のテーブルを取得対象にします')
 
         # テーブルの各セルのテキストを全て取得し、リスト化
         profiles = re.findall(r'<.+>(.+?)</.+>', mold.rm_charcode(str(profile_table[0])))
 
         # 取得失敗時のログ出力
         if len(profiles) == 0:
-            logger.info('プロフィールテーブルのカラムが見つかりません')
+            self.logger.info('プロフィールテーブルのカラムが見つかりません')
             return
 
         # リンクのないデータの取得
@@ -77,11 +88,9 @@ class Horse:
 
             if profile == '生年月日' and re.search('\d+/\d+/\d+', next_param) != None:
                 birthday = next_param
-                print(next_param)
 
             if profile == '毛色' and '毛' in next_param:
                 hair_color = next_param.replace('毛', '')
-                print(next_param)
 
             if profile == '産地' and '産' in next_param:
                 hometown = next_param.replace('産', '')
@@ -96,7 +105,7 @@ class Horse:
                 else:
                     seri_name = profiles[index + 3]
 
-        # リンクのあるデータの取得
+        # リンク付きデータの取得
         # 馬主
         owner_match = re.search('/horse/owner/(.+)/">(.+)</a>', str(profile_table[0]))
         if owner_match != None:
@@ -112,8 +121,6 @@ class Horse:
         farm_match = re.search('/breeder/(.+)/">(.+)</a>', str(profile_table[0]))
         if farm_match != None:
             farm_id, farm = farm_match.groups()
-            print(farm_id)
-            print(farm)
 
     def get_blood(self, soup):
         '''血統表情報を取得する'''
@@ -123,10 +130,10 @@ class Horse:
 
         # 取得失敗時のログ出力
         if len(blood_table) == 0:
-            logger.error('血統表テーブルが見つかりません')
+            self.logger.error('血統表テーブルが見つかりません')
             return
         elif len(blood_table) > 1:
-            logger.warning('血統表テーブルが複数見つかりました。一番上のテーブルを取得対象にします')
+            self.logger.warning('血統表テーブルが複数見つかりました。一番上のテーブルを取得対象にします')
 
         blood = blood_table[0]
 
@@ -141,8 +148,8 @@ class Horse:
 
         # 祖母
         ground_mother = blood.find_all('td', class_ = 'female')
-        fm_id, fm_name = self.blood_match(ground_father[0])
-        mm_id, mm_name = self.blood_match(ground_father[1])
+        fm_id, fm_name = self.blood_match(ground_mother[0])
+        mm_id, mm_name = self.blood_match(ground_mother[1])
 
     def blood_match(self, frame):
         match = re.search('<a href="/horse/(.*)/">(.*)</a>', str(frame))
@@ -150,6 +157,3 @@ class Horse:
             return match.groups()
         else:
             return ['', '']
-
-if __name__ == '__main__':
-    logger = log.Logger()

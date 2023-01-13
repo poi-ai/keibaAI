@@ -7,40 +7,41 @@ def main():
 
     # 設定ファイルの読み込み
     try:
-        import settings
+        import config
     except ModuleNotFoundError as e:
-        logger.error('settings.pyが見つかりません。リポジトリのルートディレクトリ直下にsettings.pyを配置してください')
+        logger.error('config.pyが見つかりません。リポジトリのルートディレクトリ直下にconfig.pyを配置してください')
         return
 
-    # 共通用ディレクトリをモジュールパスに追加
+    # 共通用ディレクトリと設定用ディレクトリモジュールパスに追加
     # README.mdの「共通用ディレクトリをモジュールパスに追加する」を実行していた場合はなくてもよい
-    sys.path.append(os.path.join('src', 'common'))
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'src', 'common'))
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
 
     # パラメータのバリデートチェック/起動させるシステムの選択
     # データ取得かデータ分析か
-    if settings.SCRIPT_TYPE == 'scraping':
+    if config.SCRIPT_TYPE == 'scraping':
         # 取得するデータの種類
-        if settings.DATA_TYPE == 'odds':
+        if config.DATA_TYPE == 'odds':
             # 取得する期間
-            if settings.DATA_TIME == 'past':
+            if config.DATA_TIME == 'past':
                 pass
-            elif settings.DATA_TIME == 'now':
+            elif config.DATA_TIME == 'now':
                 pass
             else:
                 validate_error('DATA_TIME')
-        elif settings.DATA_TYPE == 'race':
+        elif config.DATA_TYPE == 'race':
             # 取得する期間
-            if settings.DATA_TIME == 'past':
+            if config.DATA_TIME == 'past':
                 pass
-            elif settings.DATA_TIME == 'now':
+            elif config.DATA_TIME == 'now':
                 pass
             else:
                 validate_error('DATA_TIME')
-        elif settings.DATA_TYPE == 'horse':
+        elif config.DATA_TYPE == 'horse':
             # フォルダ読み込み
             from src.scraping.jbis import horse
             # インスタンス生成
-            h = horse.Horse(settings.JBIS_HORSE_ID)
+            h = horse.Horse(config.JBIS_HORSE_ID)
             # 失敗したら終了
             if not h:
                 return
@@ -48,7 +49,7 @@ def main():
             h.main()
         else:
             validate_error('DATA_TYPE')
-    elif settings.SCRIPT_TYPE == 'analysis':
+    elif config.SCRIPT_TYPE == 'analysis':
         validate_error('SCRIPT_TYPE', 'analysis')
     else:
         validate_error('SCRIPT_TYPE')
@@ -57,9 +58,9 @@ def main():
 def validate_error(variable, unavailable = None):
     '''設定ファイルのパラメータに誤りがあった場合'''
     if unavailable == None:
-        logger.error(f'settings.pyの{variable}の値が正しくありません。再度パラメータを確認してください')
+        logger.error(f'config.pyの{variable}の値が正しくありません。再度パラメータを確認してください')
     else:
-        logger.error(f'settings.pyの{variable}に{unavailable}は現在設定できません。別の値を設定してください')
+        logger.error(f'config.pyの{variable}に{unavailable}は現在設定できません。別の値を設定してください')
     exit()
 
 if __name__ == '__main__':
