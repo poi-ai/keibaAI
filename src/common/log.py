@@ -1,10 +1,8 @@
-import inspect
 import jst
 import logging
 import os
 import sys
 import re
-from pathlib import Path
 
 class Logger():
     '''loggerの設定を簡略化
@@ -16,10 +14,10 @@ class Logger():
                     0:ログのみ出力、1:コンソールのみ出力、空:両方出力
 
     '''
-    def __init__(self, output = None):
+    def __init__(self, filename, output = None):
         self.logger = logging.getLogger()
         self.output = output
-        self.filename = Path(inspect.stack()[1].filename).stem
+        self.filename = filename
         self.today = jst.date()
         self.set()
 
@@ -45,7 +43,7 @@ class Logger():
         # ログ出力設定
         if self.output != 1:
             # リポジトリのルートフォルダを指定
-            repos_root = os.path.join(os.path.dirname(__file__), '../..')
+            repos_root = os.path.join(os.path.dirname(__file__), '..', '..')
             log_folder = os.path.join(repos_root, 'log')
             # ログフォルダチェック。無ければ作成
             if not os.path.exists(log_folder):

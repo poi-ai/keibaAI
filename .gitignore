@@ -4,5 +4,5 @@
 *.json
 *.pyc
 *.log
-line_token.txt
-*/settings.py
+config/config.py
+config/dbconfig.py
