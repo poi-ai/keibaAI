@@ -33,7 +33,8 @@
 
 #### 使用バージョン
 Python >= 3.10<br>
-pip >= 22.3.1
+pip = 22.3.1<br>
+MySQL = 8.0.31
 
 #### 使用ライブラリ
 `requirements.txt`に記載
@@ -51,7 +52,7 @@ $ git clone https://github.com/poi-ai/keibaAI_new.git
 
 ### pipのアップデート
 ```
-$ python -m pip install --upgrade pip
+$ python -m pip install pip==22.3.1
 ```
 
 #### 外部ライブラリのインストール
@@ -113,11 +114,14 @@ $ export PYTHONPATH=$PYTHONPATH:<ローカルリポジトリのパス>/src/commo
 <a id="anchor4"></a>
 ## 4. 実行
 
-`<ローカルリポジトリのパス>/src/config.py`へ起動させるシステムや設定ファイルを記載した後に、
+* `/src/config.py`へ起動させるシステムや設定値の記載
+* `/src/dbconfig.py`へデータベースの接続設定
+
+この2点を行った後に、
 
 ```
 $ cd <ローカルリポジトリのパス>
 $ python main.py
 ```
 
-を実行する
+で実行できる
