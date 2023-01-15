@@ -32,16 +32,16 @@
 ## 2. 開発環境
 
 #### 使用バージョン
-Python >= 3.10<br>
-pip = 22.3.1<br>
-MySQL = 8.0.31
+Python >= 3.9.13<br>
+pip >= 22.3.1<br>
+MySQL >= 8.0.31
 
 #### 使用ライブラリ
 `requirements.txt`に記載
 
 ##### 動作確認環境
-* Windows 10 [Core i7-1065G7, 16GB]
-* CentOS 7   [さくらのVPS、1GBプラン]
+* Windows 10 (Python 4.0.2)
+* CentOS 7 (Python 3.9.13)
 
 <a id="anchor3"></a>
 ## 3. 初期設定
@@ -114,7 +114,7 @@ $ export PYTHONPATH=$PYTHONPATH:<ローカルリポジトリのパス>/src/commo
 <a id="anchor4"></a>
 ## 4. 実行
 
-* `/src/config.py`へ起動させるシステムや設定値の記載
+* `/config/config.py`へ起動させるシステムや設定値の記載
 * `/src/dbconfig.py`へデータベースの接続設定
 
 この2点を行った後に、
