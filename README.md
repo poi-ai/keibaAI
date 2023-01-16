@@ -40,14 +40,21 @@ MySQL >= 8.0.31
 `requirements.txt`に記載
 
 ##### 動作確認環境
-* Windows 10 (Python 4.0.2)
+* Windows 10 (Python 3.10.2)
 * CentOS 7 (Python 3.9.13)
 
 <a id="anchor3"></a>
 ## 3. 初期設定
 ### clone
+
+### HTTPS
 ```
 $ git clone https://github.com/poi-ai/keibaAI_new.git
+```
+
+### SSH
+```
+$ git clone git@github.com:poi-ai/keibaAI_new.git
 ```
 
 ### pipのアップデート
