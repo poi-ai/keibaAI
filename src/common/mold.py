@@ -12,6 +12,10 @@ def rm(text):
     '''改行・空白を除去'''
     return text.replace('\n', '').replace('\r', '').replace('\xa0', '').replace(' ', '').replace('　', '')
 
+def rm_nl(text):
+    '''改行(New Line)コードを除去'''
+    return text.replace('\n', '').replace('\r', '')
+
 def rm_charcode(text):
     '''文字コードを除去'''
     return text.replace('\u3000', '').replace('\xa0', '')

@@ -1,0 +1,29 @@
+# このファイルをコピーしてファイル名末尾の.sampleを外す
+
+### 起動システム設定 ###
+
+# 起動させるシステムの種類[必須]
+# scraping(データ取得) or analysis(データ分析) [現在はscrapingのみ使用可能]
+SCRIPT_TYPE = 'scraping'
+
+# 取得するデータの種類[SCRIPT_TYPE=scraping選択時は必須]
+# race(レースデータ) or odds(オッズデータ) or horse(競走馬データ)
+DATA_TYPE = 'horse'
+
+# 取得するデータの期間[DATA_TYPE=raceかodds選択時は必須]
+# past(過去データ) or now(現在データ)
+DATA_TIME = 'past'
+
+# 対象の開催
+# JRA(中央) or NAR(地方)
+ASSOSIATION = 'JRA'
+
+# JBIS独自競走馬ID
+JBIS_HORSE_ID = ''
+
+### 他 ###
+
+# システムの起動結果をLINE Notifyへ通知を行いたい場合は設定[任意]
+LINE_TOKEN = ''
+
+
