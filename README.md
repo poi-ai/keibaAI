@@ -23,23 +23,23 @@
 
 本リポジトリでは、データスクレイピングからクレンジング、モデル構築、予測まで一通りのソースコードを管理予定です。
 
-学習データは容量の都合上、本リポジトリでは扱わず、別の場所で管理を行なっております。
+学習データは容量の都合上本リポジトリでは扱わず、Google Driveなどで管理を行なっております。
 (ある程度完成に近づいたらprivateに変更予定です。)
 
-各PGの説明等、詳細は[Wiki](https://github.com/poi-ai/keibaAI_new/wiki)に記載予定です。
+~~各PGの説明等、詳細は[Wiki](https://github.com/poi-ai/keibaAI_new/wiki)に記載予定です。~~
 
 <a id="anchor2"></a>
 ## 2. 開発環境
 
-#### 使用バージョン
+### 動作確認バージョン
 Python >= 3.9.13<br>
 pip >= 22.3.1<br>
 MySQL >= 8.0.31
 
-#### 使用ライブラリ
+### 使用外部ライブラリ
 `requirements.txt`に記載
 
-##### 動作確認環境
+### 動作確認OS
 * Windows 10 (Python 3.10.2)
 * CentOS 7 (Python 3.9.13)
 
@@ -47,12 +47,12 @@ MySQL >= 8.0.31
 ## 3. 初期設定
 ### clone
 
-### HTTPS
+#### HTTPS
 ```
 $ git clone https://github.com/poi-ai/keibaAI_new.git
 ```
 
-### SSH
+#### SSH
 ```
 $ git clone git@github.com:poi-ai/keibaAI_new.git
 ```
@@ -62,12 +62,12 @@ $ git clone git@github.com:poi-ai/keibaAI_new.git
 $ python -m pip install pip==22.3.1
 ```
 
-#### 外部ライブラリのインストール
+### 外部ライブラリのインストール
 ```
 $ pip install -r requirements.txt
 ```
 
-### 共通用ディレクトリをモジュールパスに追加する
+### 共通ディレクトリをモジュールパスに追加
 
 #### Windows
 
@@ -97,34 +97,34 @@ $ setx /m PYTHONPATH "%PYTHONPATH%;<ローカルリポジトリのパス>\src\co
 を実行する
 
 #### Linux
-##### ターミナルから設定
-下記コマンドを実行
+profileファイルの編集操作を行う下記コマンドを実行
 
 ```
-$ printenv PYTHONPATH
+$ sudo vi ~/.profile
 ```
 
-何も出力されなかったら、
+ファイルの末尾に下記を追加
 
 ```
-$ export PYTHONPATH=<ローカルリポジトリのパス>/src/common:<ローカルリポジトリのパス>/config
+PYTHONPATH=$PYTHONPATH:<ローカルリポジトリのパス>/src/common:<ローカルリポジトリのパス>/config
+export PYTHONPATH
 ```
 
-何かしらのパスが出力されたら、
+下記コマンド実行で追加した内容を反映させる
 
 ```
-$ export PYTHONPATH=$PYTHONPATH:<ローカルリポジトリのパス>/src/common:<ローカルリポジトリのパス>/config
+$ source ~/.profile
 ```
-
-を実行する
 
 <a id="anchor4"></a>
 ## 4. 実行
 
-* `/config/config.py`へ起動させるシステムや設定値の記載
-* `/src/dbconfig.py`へデータベースの接続設定
+* `/config/config.py.sample`をコピーし、同階層に`config.py`という名前で保存
+* `config.py`へ起動させるシステムや設定値の記載
+* `/config/dbconfig.py.sample`をコピーし、同階層に`dbconfig.py`という名前で保存
+* `dbconfig.py`へデータベースの接続設定の記載
 
-この2点を行った後に、
+上記設定を行った後に、
 
 ```
 $ cd <ローカルリポジトリのパス>
