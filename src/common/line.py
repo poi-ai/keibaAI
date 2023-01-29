@@ -2,7 +2,7 @@ import config
 import log
 import requests
 
-logger = log.Logger('')
+logger = log.Logger()
 
 def send(message, separate_no = 1):
     ''' LINEにメッセージを送信する

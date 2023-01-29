@@ -14,7 +14,7 @@ class Logger():
                     0:ログのみ出力、1:コンソールのみ出力、空:両方出力
 
     '''
-    def __init__(self, filename, output = None):
+    def __init__(self, filename = '', output = None):
         self.logger = logging.getLogger()
         self.output = output
         self.filename = filename
@@ -49,7 +49,10 @@ class Logger():
             if not os.path.exists(log_folder):
                 os.makedirs(log_folder)
             # 出力先を設定
-            handler = logging.FileHandler(filename = os.path.join(log_folder, f'{jst.date()}_{self.filename}.log'), encoding = 'utf-8')
+            if self.filename == '':
+                handler = logging.FileHandler(filename = os.path.join(log_folder, f'{jst.date()}.log'), encoding = 'utf-8')
+            else:
+                handler = logging.FileHandler(filename = os.path.join(log_folder, f'{jst.date()}_{self.filename}.log'), encoding = 'utf-8')
             # 出力レベルを設定
             handler.setLevel(logging.INFO)
             # フォーマットの設定
