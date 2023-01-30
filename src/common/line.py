@@ -1,4 +1,5 @@
 import config
+import json
 import log
 import requests
 
@@ -6,7 +7,7 @@ logger = log.Logger()
 
 def send(message, separate_no = 1):
     ''' LINEにメッセージを送信する
-        送信にはsettings.pyの「LINE_TOKEN」にLINE Noticeの
+        送信にはconfig.py.LINE_TOKENにLINE Notice APIの
         APIトークンコードが記載されている必要がある(必須ではない)
 
     Args:
@@ -43,10 +44,18 @@ def send(message, separate_no = 1):
     try:
         r = requests.post('https://notify-api.line.me/api/notify', headers = headers, data = data)
     except Exception as e:
-        logger.error('LINE Noticeでのメッセージ送信に失敗しました')
+        logger.error('LINE Notify APIでのメッセージ送信に失敗しました')
+        logger.error(e)
         return
 
-    # TODO 送信失敗時の処理を書く(レスポンスコードから)
+    if r.status_code != 200:
+        logger.error('LINE Notify APIでエラーが発生しました')
+        logger.error('ステータスコード：' + r.status_code)
+        try:
+            logger.error('エラー内容：' + json.dumps(json.loads(r.content), indent=2))
+        except Exception as e:
+            logger.error(e)
+        return False
 
     # 未送信文字が残っていれば送信
     if unsent_message != '':
