@@ -14,6 +14,10 @@ DATA_TYPE = 'horse'
 # past(過去データ) or now(現在データ)
 DATA_TIME = 'past'
 
+OLDEST_DATE = ''
+
+LATEST_DATE = ''
+
 # 対象の開催
 # JRA(中央) or NAR(地方)
 ASSOSIATION = 'JRA'

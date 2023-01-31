@@ -1,9 +1,9 @@
-import datetime
+from datetime import datetime, timedelta
 
 '''日本時間を取得'''
 def now():
     '''現在の時刻(JST)をdatetime型で返す'''
-    return datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+    return datetime.utcnow() + timedelta(hours=9)
 
 def date():
     '''現在の日付(JST)をstr型[YYYYmmdd]で返す'''
@@ -51,17 +51,37 @@ def second():
 
 def time_min(time1, time2):
     '''datetime型の値を比較し、古い(小さい)方をdatetime型で返す'''
-    return datetime.datetime.strptime(min(time1.strftime("%Y%m%d%H%M%S"), time2.strftime("%Y%m%d%H%M%S")), "%Y%m%d%H%M%S")
+    return datetime.strptime(min(time1.strftime("%Y%m%d%H%M%S"), time2.strftime("%Y%m%d%H%M%S")), "%Y%m%d%H%M%S")
+
+def between_month(date1, date2):
+    '''2つの日付間の年月を取得する'''
+
+    # datetime型に変換
+    start = datetime.strptime(min(date1, date2), "%Y%m%d")
+    end = datetime.strptime(max(date1, date2), "%Y%m%d")
+
+    # 2日付間の全日付を取得
+    date_range = [start + timedelta(days = x) for x in range(0, (end - start).days + 1)]
+
+    # 年月だけ文字列型に変換し、重複を削除する
+    month_list = []
+    for date in date_range:
+        if date.strftime("%Y%m") not in month_list:
+            month_list.append(date.strftime("%Y%m"))
+
+    return month_list
 
 def yesterday(date = date()):
     '''指定した一日前の日付をstr型(yyyyMMDD)で返す'''
-    dt_date = datetime.datetime.strptime(date, '%Y%m%d')
-    return datetime.datetime.strftime(dt_date - datetime.timedelta(1), '%Y%m%d')
+    dt_date = datetime.strptime(date, '%Y%m%d')
+    return datetime.strftime(dt_date - timedelta(1), '%Y%m%d')
 
 def clock(date = now()):
     '''指定した時間をHH:MMフォーマットで返す'''
-    return datetime.datetime.strftime(date, '%H:%M')
+    return datetime.strftime(date, '%H:%M')
 
 def change_format(value, before_format, after_format):
     '''時間を表すstr型のフォーマットを変更して返す'''
-    return datetime.datetime.strftime(datetime.datetime.strptime(value, before_format), after_format)
+    return datetime.strftime(datetime.strptime(value, before_format), after_format)
+
+
