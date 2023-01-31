@@ -1,11 +1,11 @@
 import babaid
+import dataframe
 import datetime
 import jst
 import line
 import log
 import output
 import pandas as pd
-import pd_read
 import re
 import requests
 import time
@@ -159,7 +159,7 @@ class Odds(Base):
                     continue
 
             # HTMLからレース情報記載のテーブル箇所のみDataFrameに切り出し
-            info_table = pd_read.html(str(soup))[0]
+            info_table = dataframe.get_table(str(soup))[0]
 
             # カラムが正常に取れているかのチェック
             if not '発走時刻' in info_table.columns:
@@ -367,7 +367,7 @@ class Odds(Base):
         if soup == -1:
             self.logger.error(f'オッズの取得に失敗しました')
             raise
-        odds_table = pd_read.html(str(soup))[0]
+        odds_table = dataframe.get_table(str(soup))[0]
 
         try:
             # 馬番・単勝オッズのカラムのみ抽出

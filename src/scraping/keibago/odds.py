@@ -1,11 +1,11 @@
 import babaid
 import datetime
+import dataframe
 import jst
 import line
 import log
 import output
 import pandas as pd
-import pd_read
 import time
 import traceback
 from base import Base
@@ -46,7 +46,7 @@ class Odds(Base):
         '''稼働日の各競馬場のレースリストURLを取得する'''
 
         # keiba.go.jpから稼働日に開催のある競馬場名を取得する
-        result = pd_read.html('https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/TopTodayRaceInfoMini')
+        result = dataframe.get_table('https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/TopTodayRaceInfoMini')
         if result == -1:
             self.logger.error(f'開催情報の取得に失敗しました')
             raise
@@ -72,7 +72,7 @@ class Odds(Base):
         '''
         for race_url in self.baba_url:
             # レース情報をDataFrame型で取得
-            result = pd_read.html(race_url)
+            result = dataframe.get_table(race_url)
             if result == -1:
                 self.logger.error(f'{babaid.keibago(race_url[-2:].replace("=", ""))}競馬場のレース情報取得に失敗しました')
 
@@ -229,7 +229,7 @@ class Odds(Base):
     def get_odds(self, race):
         '''(単勝・複勝)オッズの取得・記録を行う'''
         # オッズのテーブルを取得
-        result = pd_read.html(f'https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/OddsTanFuku?k_raceDate={Odds.RACE_DATE}&k_raceNo={race.race_no}&k_babaCode={race.baba_code}')
+        result = dataframe.get_table(f'https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/OddsTanFuku?k_raceDate={Odds.RACE_DATE}&k_raceNo={race.race_no}&k_babaCode={race.baba_code}')
         if result == -1:
             self.logger.error(f'オッズテーブルの取得に失敗しました')
             raise
