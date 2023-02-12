@@ -12,7 +12,7 @@ class Base:
         else:
             self.logger = log.Logger(Path(inspect.stack()[1].filename).stem)
 
-    def error_output(self, message, e, stacktrace):
+    def error_output(self, message, e = None, stacktrace = None, line_flg = True):
         '''エラー時のログ出力/LINE通知を行う
 
         Args:
@@ -20,7 +20,15 @@ class Base:
             e(str) : エラー名
             stacktrace(str) : スタックトレース
         '''
+        line_message = message
         self.logger.error(message)
-        self.logger.error(e)
-        self.logger.error(stacktrace)
-        line.send(f'{message}\n{e}\n{stacktrace}')
+
+        if e != None:
+            self.logger.error(e)
+            line_message += f'\n{e}'
+
+        if stacktrace != None:
+            self.logger.error(stacktrace)
+            line_message += f'\n{stacktrace}'
+
+        if line_message: line.send(line_message)

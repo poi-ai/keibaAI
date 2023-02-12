@@ -1,10 +1,11 @@
+import config
 import jst
 import line
 import time
 import traceback
 from base import Base
-from keibago.odds import Odds as narodds
-from jra.odds import Odds as jraodds
+from .keibago.odds import Odds as narodds
+from .jra.odds import Odds as jraodds
 
 class NowOdds(Base):
     '''中央・地方競馬オッズ取得
@@ -14,8 +15,19 @@ class NowOdds(Base):
     '''
     def __init__(self):
         super().__init__()
-        self.jra_flg = True
-        self.nar_flg = True
+        # 取得対象設定
+        if config.ASSOSIATION == '1':
+            self.jra_flg = self.nar_flg = True
+        elif config.ASSOSIATION == 'JRA':
+            self.jra_flg = True
+            self.nar_flg = False
+        elif config.ASSOSIATION == 'NAR':
+            self.jra_flg = True
+            self.nar_flg = False
+        else:
+            self.error_output(f'中央・地方競馬オッズ取得システム取得対象設定値エラー：{config.ASSOSIATION}')
+            exit()
+
         self.logger.info('----------------------------')
         self.logger.info('中央・地方競馬オッズ記録システム起動')
         self.logger.info('初期処理開始')
@@ -56,7 +68,7 @@ class NowOdds(Base):
 
         # 中央競馬用インスタンス作成
         try:
-            jra = jraodds.Odds()
+            jra = jraodds()
         except Exception as e:
             self.error_output('中央_初期処理でエラー', e, traceback.format_exc(), False)
             self.jra_flg = False
@@ -67,7 +79,7 @@ class NowOdds(Base):
 
         # 地方競馬用インスタンス作成
         try:
-            nar = narodds.Odds()
+            nar = narodds()
         except Exception as e:
             self.error_output('地方_初期処理でエラー', e, traceback.format_exc(), False)
             self.nar_flg = False
@@ -119,7 +131,6 @@ class NowOdds(Base):
                 self.jra_flg = False
         else:
             self.logger.info(f'中央の取得対象レースはありません')
-
 
         # 地方の発走までの時間チェック
         if self.nar_flg:
@@ -203,21 +214,3 @@ class NowOdds(Base):
             if self.nar_flg:
                 if len(self.nar.write_data) != 0:
                     self.nar.record_odds()
-
-    def error_output(self, message, e, stacktrace, line_flg = True):
-        '''エラー時のログ出力/LINE通知を行う
-
-        Args:
-            message(str) : エラーメッセージ
-            e(str) : エラー名
-            stacktrace(str) : スタックトレース
-        '''
-        self.logger.error(message)
-        self.logger.error(e)
-        self.logger.error(stacktrace)
-        if line_flg:
-            line.send(message)
-            line.send(e)
-            line.send(stacktrace)
-
-

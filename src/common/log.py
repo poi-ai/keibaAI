@@ -35,7 +35,7 @@ class Logger():
                     os.remove(log_path.group(1))
 
         # フォーマットの設定
-        formatter = logging.Formatter('%(asctime)s - [%(levelname)s] %(message)s')
+        formatter = logging.Formatter(f'%(asctime)s {self.filename.rjust(15, " ")} - [%(levelname)s] %(message)s')
 
         # 出力レベルの設定
         self.logger.setLevel(logging.INFO)
@@ -49,10 +49,7 @@ class Logger():
             if not os.path.exists(log_folder):
                 os.makedirs(log_folder)
             # 出力先を設定
-            if self.filename == '':
-                handler = logging.FileHandler(filename = os.path.join(log_folder, f'{jst.date()}.log'), encoding = 'utf-8')
-            else:
-                handler = logging.FileHandler(filename = os.path.join(log_folder, f'{jst.date()}_{self.filename}.log'), encoding = 'utf-8')
+            handler = logging.FileHandler(filename = os.path.join(log_folder, f'{jst.date()}.log'), encoding = 'utf-8')
             # 出力レベルを設定
             handler.setLevel(logging.INFO)
             # フォーマットの設定

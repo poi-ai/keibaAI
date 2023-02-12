@@ -88,7 +88,6 @@ def args_check():
        第五引数 : DB出力するか ( 1 or 0)
 
     '''
-    print(sys.argv)
     args, ln = sys.argv, len(sys.argv)
 
     # 引数なしの場合

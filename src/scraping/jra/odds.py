@@ -1,9 +1,9 @@
 import babaid
 import dataframe
 import datetime
+import config
 import jst
 import line
-import log
 import output
 import pandas as pd
 import re
@@ -34,7 +34,7 @@ class Odds(Base):
     RACE_CARD_URL = 'https://www.jra.go.jp/JRADB/accessD.html'
 
     def __init__(self):
-        super().__init__()
+        super().__init__('jra.odds')
         self.logger.info('----------------------------')
         self.logger.info('中央競馬オッズ記録システム起動')
         line.send('中央競馬オッズ記録システム起動')
@@ -288,7 +288,6 @@ class Odds(Base):
             else:
                 return True
 
-
     def get_target_race(self, get_time):
         '''待機時間後に取得対象となるレースを抽出'''
 
@@ -387,7 +386,6 @@ class Odds(Base):
                 self.logger.info('-----------------')
                 self.logger.info(odds_table)
                 self.logger.info('-----------------')
-                logger
                 raise
 
         self.logger.info(f'{babaid.jra(race.baba_code)}{race.race_no}Rの{str(round((race.race_time - jst.now()).total_seconds() / 60)) + "分前" if race.record_flg == "1" else "最終"}オッズ取得')
@@ -403,13 +401,18 @@ class Odds(Base):
     def record_odds(self):
         '''取得したオッズをCSV/Google Spread Sheetに出力する'''
 
-        # CSVに出力する
-        try:
-            output.csv(self.write_data, f'jra_resultodds_{jst.year()}{jst.zmonth()}')
-        except Exception as e:
-            self.error_output('オッズ出力処理でエラー', e, traceback.format_exc())
+        # CSV出力
+        if str(config.OUTPUT_CSV) == '1':
+            try:
+                output.csv(self.write_data, f'jra_resultodds_{jst.year()}{jst.zmonth()}')
+            except Exception as e:
+                self.error_output('CSV出力処理でエラー', e, traceback.format_exc())
 
-        # TODO Google Spread Sheetに出力
+        # TODO DB出力
+        if str(config.OUTPUT_DB) == '1':
+            pass
+
+        # Google Spread Sheetに出力
         # writesheet.write_spread_sheet(self.write_data, jst.month().zfill(2))
 
         # 記録用データを空にする
@@ -425,21 +428,6 @@ class Odds(Base):
                 race.record_flg = '-1'
 
         self.logger.info('オッズデータをCSVへ出力')
-
-    def error_output(self, message, e, stacktrace):
-        '''エラー時のログ出力/LINE通知を行う
-
-        Args:
-            message(str) : エラーメッセージ
-            e(str) : エラー名
-            stacktrace(str) : スタックトレース
-        '''
-        self.logger.error(message)
-        self.logger.error(e)
-        self.logger.error(stacktrace)
-        line.send(message)
-        line.send(e)
-        line.send(stacktrace)
 
 class RaceInfo():
     '''各レースの情報を保持を行う
@@ -464,61 +452,3 @@ class RaceInfo():
         self.race_time = race_time
         self.record_flg = '0'
         self.jra_flg = '1'
-
-# 単体起動時
-if __name__ == '__main__':
-    # ログ用インスタンス作成
-    logger = log.Logger()
-
-    # 中央競馬用インスタンス作成
-    try:
-        jra = Odds()
-    except Exception as e:
-        logger.error('初期処理でエラー')
-        logger.error(e)
-        logger.error(traceback.format_exc())
-        line.send('初期処理でエラー')
-        line.send(e)
-        line.send(traceback.format_exc())
-        exit()
-
-    if not jra.kaisai:
-        logger.info('本日行われるレースはありません')
-        exit()
-
-    while True:
-        # 全レース記録済かチェック
-        if not jra.continue_check():
-            break
-
-        while True:
-
-            # 発走時刻更新
-            try:
-                jra.get_race_info()
-            except Exception as e:
-                jra.error_output('発走時刻更新処理でエラー', e, traceback.format_exc())
-                exit()
-
-            # 発走までの時間チェック待機
-            try:
-                if jra.time_check():
-                    break
-            except Exception as e:
-                jra.error_output('発走時刻までの待機処理でエラー', e, traceback.format_exc())
-                exit()
-
-        # 暫定オッズ取得処理
-        jra.get_select_realtime()
-
-        time.sleep(2)
-
-        # 確定オッズ取得処理
-        jra.get_select_confirm()
-
-        # 記録データが格納されていてx分40秒を過ぎていなければCSV出力
-        if int(jst.second()) <= 40 and len(jra.write_data) != 0:
-            jra.record_odds()
-
-    logger.info('中央競馬オッズ記録システム終了')
-    line.send('中央競馬オッズ記録システム終了')

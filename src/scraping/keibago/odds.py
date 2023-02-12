@@ -1,9 +1,9 @@
 import babaid
-import datetime
 import dataframe
+import datetime
+import config
 import jst
 import line
-import log
 import output
 import pandas as pd
 import time
@@ -28,6 +28,7 @@ class Odds(Base):
     RACE_DATE = f'{jst.year()}%2f{jst.month().zfill(2)}%2f{jst.day().zfill(2)}'
 
     def __init__(self):
+        super().__init__('keibago.odds')
         self.logger.info('----------------------------')
         self.logger.info('地方競馬オッズ記録システム起動')
         line.send('地方競馬オッズ記録システム起動')
@@ -250,13 +251,18 @@ class Odds(Base):
     def record_odds(self):
         '''取得したオッズをCSV/Google Spread Sheetに出力する'''
 
-        # CSVに出力する
-        try:
-            output.csv(self.write_data, f'nar_resultodds_{jst.year()}{jst.zmonth()}')
-        except Exception as e:
-            self.error_output('オッズ出力処理でエラー', e, traceback.format_exc(), False)
+        # CSV出力
+        if str(config.OUTPUT_CSV) == '1':
+            try:
+                output.csv(self.write_data, f'nar_resultodds_{jst.year()}{jst.zmonth()}')
+            except Exception as e:
+                self.error_output('CSV出力処理でエラー', e, traceback.format_exc(), False)
 
-        # TODO Google Spread Sheetに出力
+        # TODO DB出力
+        if str(config.OUTPUT_DB) == '1':
+            pass
+
+        # Google Spread Sheetに出力
         # writesheet.write_spread_sheet(self.write_data, jst.month().zfill(2))
 
         # 記録用データを空にする
@@ -326,22 +332,6 @@ class Odds(Base):
             if int(jst.second()) > 40:
                 break
 
-    def error_output(self, message, e, stacktrace, line_flg = True):
-        '''エラー時のログ出力/LINE通知を行う
-
-        Args:
-            message(str) : エラーメッセージ
-            e(str) : エラー名
-            stacktrace(str) : スタックトレース
-        '''
-        self.logger.error(message)
-        self.logger.error(e)
-        self.logger.error(stacktrace)
-        if line_flg:
-            line.send(message)
-            line.send(e)
-            line.send(stacktrace)
-
 class RaceInfo():
     '''各レースの情報を保持を行う
     Instance Parameter:
@@ -363,57 +353,3 @@ class RaceInfo():
         self.race_time = race_time
         self.record_flg = '0'
         self.jra_flg = '0'
-
-# 単体起動時
-if __name__ == '__main__':
-
-    # ログ用インスタンス作成
-    logger = log.Logger()
-
-    # 地方競馬用インスタンス作成
-    try:
-        nar = Odds()
-    except Exception as e:
-        logger.error('初期処理でエラー')
-        logger.error(e)
-        logger.error(traceback.format_exc())
-        line.send('初期処理でエラー')
-        line.send(e)
-        line.send(traceback.format_exc())
-        exit()
-
-    while True:
-        # 全レース記録済かチェック
-        if not nar.continue_check():
-            break
-
-        while True:
-            # 発走時刻更新
-            try:
-                nar.get_race_info()
-            except Exception as e:
-                nar.error_output('発走時刻更新処理でエラー', e, traceback.format_exc(), False)
-                exit()
-
-            # 発走までの時間チェック待機
-            try:
-                if nar.time_check():
-                    break
-            except Exception as e:
-                nar.error_output('発走時刻までの待機処理でエラー', e, traceback.format_exc(), False)
-                exit()
-
-        # 暫定オッズ取得処理
-        nar.get_select_realtime()
-
-        time.sleep(2)
-
-        # 確定オッズ取得処理
-        nar.get_select_confirm()
-
-        # 記録データが格納されていてx分40秒を過ぎていなければCSV出力
-        if int(jst.second()) <= 40 and len(nar.write_data) != 0:
-            nar.record_odds()
-
-    logger.info('地方競馬オッズ記録システム終了')
-    line.send('地方競馬オッズ記録システム終了')
