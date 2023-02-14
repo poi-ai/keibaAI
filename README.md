@@ -100,7 +100,7 @@ $ setx /m PYTHONPATH "%PYTHONPATH%;<ローカルリポジトリのパス>\src\co
 profileファイルの編集操作を行う下記コマンドを実行
 
 ```
-$ sudo vi ~/.profile
+$ sudo vi ~/.bash_profile
 ```
 
 ファイルの末尾に下記を追加

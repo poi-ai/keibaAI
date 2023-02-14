@@ -108,7 +108,7 @@ PName=NAR_RACE_PROGRESS_DATA
 LName=地方レース進行データ
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1650
 Top=700
 Field="レースID","race_id","@INT(12)","NOT NULL",0,"","netkeiba独自レースID",$FFFFFFFF,""
@@ -122,7 +122,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20221213171224
-Position="Main",1650,700,373,161
+Position="MAIN",1650,700,373,161
 ZOrder=6
 
 [Relation]
@@ -152,7 +152,7 @@ PName=HORSE_DATA
 LName=競走馬データ
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1150
 Top=1400
 Field="競走馬ID","horse_id","","NOT NULL",0,"","netkeiba独自ID",$FFFFFFFF,""
@@ -166,7 +166,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20221213172128
-Position="Main",1150,1400,249,157
+Position="MAIN",1150,1400,249,157
 ZOrder=8
 
 [Entity]
@@ -174,7 +174,7 @@ PName=NAR_RACE_RESULT
 LName=地方レース結果データ
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1800
 Top=1400
 Field="競走馬ID","horse_id","","NOT NULL",0,"","",$FFFFFFFF,""
@@ -189,7 +189,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20221213173557
-Position="Main",1800,1400
+Position="MAIN",1800,1400
 ZOrder=10
 
 [Relation]
@@ -241,7 +241,7 @@ PName=NAR_HORSE_DATA
 LName=地方レース馬データ
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=2050
 Top=900
 Field="競走馬ID","horse_id","","NOT NULL",0,"","netkeiba独自ID",$FFFFFFFF,""
@@ -270,7 +270,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20221213175905
-Position="Main",2050,900
+Position="MAIN",2050,900
 ZOrder=13
 
 [Relation]
@@ -316,3 +316,25 @@ Bar3=635
 TermPos1=R
 TermPos2=R
 ZOrder=15
+
+[Entity]
+PName=NAR_ODDS
+LName=地方競馬オッズ
+Comment=
+TableOption=
+Page=Main
+Left=1050
+Top=1800
+Field="","race_id","@VARCHAR(12)","NOT NULL",0,"","い",$FFFFFFFF,""
+Field="","horse_no","TINYINT","NOT NULL",1,"","",$FFFFFFFF,""
+Field="","win_odds","FLOAT UNSIGINED",,,"","",$FFFFFFFF,""
+Field="","place_min_odds","FLOAT UNSIGINED",,,"","",$FFFFFFFF,""
+Field="","place_max_odds","FLOAT UNSIGINED",,,"","",$FFFFFFFF,""
+Field="","remaining_time","TINYINT","NOT NULL",,"","",$FFFFFFFF,""
+Field="","created_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20230214135728
+Position="Main",1050,1800
+ZOrder=16

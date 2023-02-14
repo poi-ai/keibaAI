@@ -18,7 +18,7 @@ class Base:
         Args:
             message(str) : エラーメッセージ
             e(str) : エラー名
-            stacktrace(str) : スタックトレース
+            stacktrace(str) : スタックトレース(traceback.format_exc())
         '''
         line_message = message
         self.logger.error(message)
@@ -31,4 +31,5 @@ class Base:
             self.logger.error(stacktrace)
             line_message += f'\n{stacktrace}'
 
-        if line_message: line.send(line_message)
+        if line_flg:
+            line.send(line_message)
