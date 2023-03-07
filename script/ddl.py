@@ -1,13 +1,20 @@
+import math
 import pandas as pd
 
 # Excelファイルを読み込む
 df = pd.read_excel('create_ddl.xlsx', sheet_name='テーブル定義')
+df.columns = [i for i in range(10)]
 
-# テーブル名を取得する
-table_name = df.columns[0]
+# テーブル名取得
+table_name = df[2][0]
 
-# 列名、データ型、長さ、主キー、複合キー、必須チェック、コメントを取得し、DDLを生成する
+if math.isnan(table_name):
+    print('テーブル名が未設定です')
+    exit()
+
 ddl = f"CREATE TABLE {table_name} (\n"
+
+# パラメータの各項目を取得
 for row in df.iterrows():
     print(df)
     exit()
