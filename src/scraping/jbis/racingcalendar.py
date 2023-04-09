@@ -24,9 +24,11 @@ class Calendar(Base):
         '''JBISレーシングカレンダーページから開催情報の取得を行う
 
         Return:
-            extraction_hold_list[[開催日<str>, 競馬場ID<str>],...] : 指定期間内の開催情報のリスト
+            hold_list[[開催日<str>, 競馬場ID<str>],...] : 指定期間内の開催情報のリスト
 
         '''
+        hold_list = []
+
         # ひと月ずつ開催情報を取得する
         for month in jst.between_month(self.oldest_date, self.latest_date):
             # HTML取得
@@ -38,13 +40,15 @@ class Calendar(Base):
             # 開催情報切り出し
             extraction_hold_list = self.extraction_hold(hold_list)
 
-            # 中央or地方のみを切り出して返す
-            if self.association == '2':
-                return self.jra(extraction_hold_list)
+            # 中央のみor地方のみor両方を切り出して返す
+            if self.association == '1':
+                hold_list += extraction_hold_list
+            elif self.association == '2':
+                hold_list += self.jra(extraction_hold_list)
             elif self.association == '3':
-                return self.nar(extraction_hold_list)
+                hold_list += self.nar(extraction_hold_list)
 
-            return extraction_hold_list
+        return hold_list
 
     def get_soup(self, month):
         '''指定ページした年月(yyyymm型)のcalendarページのHTMLを取得'''
