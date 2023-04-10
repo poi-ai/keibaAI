@@ -48,7 +48,7 @@ def main():
                 validate_error('DATA_TIME')
         elif config.DATA_TYPE == 'horse':
             # フォルダ読み込み
-            from src.scraping.jbis.access import horse
+            from src.scraping.access.jbis import horse
             # インスタンス生成
             h = horse.Horse(config.JBIS_HORSE_ID)
             # 失敗したら終了
