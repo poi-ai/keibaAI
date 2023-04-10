@@ -1,10 +1,9 @@
 from base import Base
 import datetime
 
-class Horse(Base):
+class Horses(Base):
     def __init__(self):
         super().__init__()
-        self.id = 0
         self.jbis_id = 0
         self.father_name = ''
         self.father_jbis_id = None
@@ -78,6 +77,14 @@ class Horse(Base):
             return False
         self._birth_day = value
         return True
+
+    @property
+    def country(self):
+        return self._country
+
+    @country.setter
+    def country(self, value):
+        self._country = value
 
     @property
     def birth_place(self):

@@ -6,27 +6,25 @@ from base import Base
 
 class Horse(Base):
     def __init__(self, horse_id):
+        super().__init__()
         self.horse_id = horse_id
 
     def main(self):
-        '''主処理
-        
-        Return:
+        '''主処理 TODO 後で消す
+
+        Returns:
             bool: 処理結果
-        
+
         '''
 
         # HTML取得
         try:
-            soup = gethtml.soup(f'https://www.jbis.or.jp/horse/{self.horse_id}/')
+            soup, result = self.get_soup()
         except Exception as e:
             self.error_output('競走馬ページ取得取得処理でエラー', e, traceback.format_exc())
             return
 
-        # 存在しないページチェック
-        if '指定されたＵＲＬのページは存在しません。' in str(soup):
-            self.logger.warning('JBIS競走馬IDが不正です')
-            return False
+        if not result: return False
 
         # 馬名/生産国情報取得
         try:
@@ -51,25 +49,104 @@ class Horse(Base):
 
         return True
 
+    def get_soup(self, horse_id = None):
+        '''
+        指定したJBIS競走馬IDの競走馬ページのHTMLをbs4型で取得する
+
+        Args:
+            horse_id(int): 取得する対象のJBIS競走馬ID
+                ※未指定の場合はインスタンス変数のhorse_idを使用
+
+        Returns:
+            soup(bs4.BeautifulSoup): 競走馬ページのHTML
+            exist(bool): 指定した競走馬IDが存在するか
+
+        '''
+        # 競走馬IDが指定されいない場合はインスタンス変数から引っ張る
+        if horse_id == None:
+            horse_id = self.horse_id
+
+        # HTML取得
+        soup = gethtml.soup(f'https://www.jbis.or.jp/horse/{self.horse_id}/')
+
+        # 存在しないページチェック
+        if '指定されたＵＲＬのページは存在しません。' in str(soup):
+            return None, False
+
+        return soup, True
+
     def get_horse_name(self, soup):
-        '''馬名と生産国を取得する'''
+        '''
+        馬名と生産国を取得する
+
+        Args:
+            soup(bs4.BeautifulSoup): 競走馬ページのHTML
+
+        Returns:
+            horse_info(dict): 競走馬の情報を格納した辞書
+                ・horse_name(馬名)
+                ・country(生産国)
+
+        '''
+
+        horse_info = {}
 
         # ページタイトルを取得
         title = soup.find('title').text
 
         # 馬名を取得
-        horse_name = title[:title.find('｜')]
+        horse_info['horse_name'] = title[:title.find('｜')]
 
         # 生産国判定(海外馬は末尾に国の略名が付く)
-        m = re.search('(.+)\((.+)\)', horse_name)
+        m = re.search('(.+)\((.+)\)', horse_info['horse_name'])
         if m != None:
-            horse_name = m.groups()[0]
-            country = m.groups()[1]
+            horse_info['horse_name'] = m.groups()[0]
+            horse_info['country'] = m.groups()[1]
         else:
-            country = 'JPN'
+            horse_info['country'] = 'JPN'
+
+        return horse_info
 
     def get_profile(self, soup):
-        '''馬の基本情報を取得する'''
+        '''
+        馬の基本情報を取得する
+
+        Args:
+            soup(bs4.BeautifulSoup): 競走馬ページのHTML
+
+        Returns:
+            horse_info(dict): 競走馬の情報を格納した辞書
+                ・birthday(誕生日)
+                ・hair_color(毛色)
+                ・birth_place(生産地)
+                ・seri_year(セリが行われた年)
+                ・seri_price(セリで取引された金額)
+                ・seri_id(取引されたセリのJBISID)
+                ・seri_name(取引されたセリの名称)
+                ・owner_id(馬主のJBISID)
+                ・owner_name(馬主名)
+                ・trainer_id(調教師のJBISID)
+                ・trainer_name(調教師の所属)
+                ・farm_id(生産牧場のJBISID)
+                ・farm_name(生産牧場名)
+            bool: プロフィールテーブルが正確に存在しているか
+
+        '''
+        horse_info = {
+            'birthday': '',
+            'hair_color': '',
+            'birth_place': '',
+            'seri_year': '',
+            'seri_price': '',
+            'seri_id': '',
+            'seri_name': '',
+            'owner_id': '',
+            'owner_name': '',
+            'trainer_id': '',
+            'trainer_name': '',
+            'farm_id': '',
+            'farm_name': ''
+        }
 
         # プロフィールテーブルの取得
         profile_table = soup.find_all('table', class_ = 'tbl-data-05 reset-mb-40')
@@ -77,7 +154,7 @@ class Horse(Base):
         # 取得失敗時のログ出力
         if len(profile_table) == 0:
             self.logger.error('プロフィールテーブルが見つかりません')
-            return
+            return None, False
         elif len(profile_table) > 1:
             self.logger.warning('プロフィールテーブルが複数見つかりました。一番上のテーブルを取得対象にします')
 
@@ -87,7 +164,7 @@ class Horse(Base):
         # 取得失敗時のログ出力
         if len(profiles) == 0:
             self.logger.info('プロフィールテーブルのカラムが見つかりません')
-            return
+            return None, False
 
         # リンクのないデータの取得
         for index, profile in enumerate(profiles):
@@ -97,43 +174,81 @@ class Horse(Base):
             next_param = profiles[index + 1]
 
             if profile == '生年月日' and re.search('\d+/\d+/\d+', next_param) != None:
-                birthday = next_param
+                horse_info['birthday'] = next_param
 
             if profile == '毛色' and '毛' in next_param:
-                hair_color = next_param.replace('毛', '')
+                horse_info['hair_color'] = next_param.replace('毛', '')
 
             if profile == '産地' and '産' in next_param:
-                hometown = next_param.replace('産', '')
+                horse_info['birth_place'] = next_param.replace('産', '')
 
             if profile == '市場取引' and index + 3 < len(profiles):
-                seri_year = next_param.replace('年', '')
-                seri_price = profiles[index + 2].replace('万円', '')
+                horse_info['seri_year'] = next_param.replace('年', '')
+                horse_info['seri_price'] = profiles[index + 2].replace('万円', '')
 
                 seri_match = re.search('/seri/.+/(.+)/">(.+)</a>', str(profile_table[0]))
                 if seri_match != None:
-                    seri_id, seri_name = seri_match.groups()
+                    horse_info['seri_id'], horse_info['seri_name'] = seri_match.groups()
                 else:
-                    seri_name = profiles[index + 3]
+                    horse_info['seri_name'] = profiles[index + 3]
 
         # リンク付きデータの取得
         # 馬主
         owner_match = re.search('/horse/owner/(.+)/">(.+)</a>', str(profile_table[0]))
         if owner_match != None:
-            owner_id, owner = owner_match.groups()
+            horse_info['owner_id'], horse_info['owner_name'] = owner_match.groups()
 
         # 調教師
         trainer_match = re.search('/horse/trainer/(.+)/">(.+)</a>(.+)</td>', str(profile_table[0]))
         if trainer_match != None:
-            trainer_id, trainer, trainer_belong = trainer_match.groups()
-            trainer_belong = mold.rm(trainer_belong).replace('（', '').replace('）', '')
+            horse_info['trainer_id'], horse_info['trainer_name'], horse_info['trainer_belong'] = trainer_match.groups()
+            horse_info['trainer_belong'] = mold.rm(horse_info['trainer_belong']).replace('（', '').replace('）', '')
 
         # 生産牧場
         farm_match = re.search('/breeder/(.+)/">(.+)</a>', str(profile_table[0]))
         if farm_match != None:
-            farm_id, farm = farm_match.groups()
+            horse_info['farm_id'], horse_info['farm_name'] = farm_match.groups()
+
+        return horse_info, True
 
     def get_blood(self, soup):
-        '''血統表情報を取得する'''
+        '''
+        血統表情報を取得する
+
+        Args:
+            soup(bs4.BeautifulSoup): 競走馬ページのHTML
+
+        Returns:
+            blood_info(dict): 競走馬の血統情報を格納した辞書
+                ・f_id(父のJBIS競走馬ID)
+                ・f_name(父の名前)
+                ・m_id(母のJBIS競走馬ID)
+                ・m_name(母の名前)
+                ・ff_id(父父のJBIS競走馬ID)
+                ・ff_name(父父の名前)
+                ・fm_id(父母のJBIS競走馬ID)
+                ・fm_name(父母の名前)
+                ・mf_id(母父のJBIS競走馬ID)
+                ・mf_name(母父の名前)
+                ・mm_id(母母のJBIS競走馬ID)
+                ・mm_name(母母の名前)
+            bool: 血統表テーブルが正確に存在しているか
+
+        '''
+        blood_info = {
+            'f_id': '',
+            'f_name': '',
+            'm_id': '',
+            'm_name': '',
+            'ff_id': '',
+            'ff_name': '',
+            'fm_id': '',
+            'fm_name': '',
+            'mf_id': '',
+            'mf_name': '',
+            'mm_id': '',
+            'mm_name': ''
+        }
 
         # 血統表テーブルを取得
         blood_table = soup.find_all('table', class_ = 'tbl-pedigree-01 reset-mb-40')
@@ -141,32 +256,44 @@ class Horse(Base):
         # 取得失敗時のログ出力
         if len(blood_table) == 0:
             self.logger.error('血統表テーブルが見つかりません')
-            return
+            return None, False
         elif len(blood_table) > 1:
             self.logger.warning('血統表テーブルが複数見つかりました。一番上のテーブルを取得対象にします')
 
         blood = blood_table[0]
 
         # 両親
-        f_id, f_name = self.blood_match(blood.find('th', class_ = 'male'))
-        m_id, m_name = self.blood_match(blood.find('th', class_ = 'female'))
+        blood_info['f_id'], blood_info['f_name'] = self.blood_match(blood.find('th', class_ = 'male'))
+        blood_info['m_id'], blood_info['m_name'] = self.blood_match(blood.find('th', class_ = 'female'))
 
         # 祖父
         ground_father = blood.find_all('td', class_ = 'male')
-        ff_id, ff_name = self.blood_match(ground_father[0])
-        mf_id, mf_name = self.blood_match(ground_father[1])
+        blood_info['ff_id'], blood_info['ff_name'] = self.blood_match(ground_father[0])
+        blood_info['mf_id'], blood_info['mf_name'] = self.blood_match(ground_father[1])
 
         # 祖母
         ground_mother = blood.find_all('td', class_ = 'female')
-        fm_id, fm_name = self.blood_match(ground_mother[0])
-        mm_id, mm_name = self.blood_match(ground_mother[1])
+        blood_info['fm_id'], blood_info['fm_name'] = self.blood_match(ground_mother[0])
+        blood_info['mm_id'], blood_info['mm_name'] = self.blood_match(ground_mother[1])
+
+        return blood_info, True
 
     def blood_match(self, frame):
+        '''
+        血統表テーブルの指定した枠から競走馬IDと競走馬名を抜き出す
+
+        Args:
+            frame(str): 血統表の中の1枠分のHTML
+
+        Return:
+            tuple(horse_id(str), horse_name(str)): 競走馬名と競走馬ID
+
+        '''
         match = re.search('<a href="/horse/(.*)/">(.*)</a>', str(frame))
         if match != None:
             return match.groups()
         else:
-            return ['', '']
+            return ('', '')
 
 # キタサンブラック
 h = Horse('0001155349')
