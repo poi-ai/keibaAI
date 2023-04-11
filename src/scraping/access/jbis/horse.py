@@ -127,8 +127,8 @@ class Horse(Base):
                 ・owner_name(馬主名)
                 ・trainer_id(調教師のJBISID)
                 ・trainer_name(調教師の所属)
-                ・farm_id(生産牧場のJBISID)
-                ・farm_name(生産牧場名)
+                ・breeder_id(生産牧場のJBISID)
+                ・breeder_name(生産牧場名)
             bool: プロフィールテーブルが正確に存在しているか
 
         '''
@@ -144,8 +144,8 @@ class Horse(Base):
             'owner_name': '',
             'trainer_id': '',
             'trainer_name': '',
-            'farm_id': '',
-            'farm_name': ''
+            'breeder_id': '',
+            'breeder_name': ''
         }
 
         # プロフィールテーブルの取得
@@ -205,9 +205,9 @@ class Horse(Base):
             horse_info['trainer_belong'] = mold.rm(horse_info['trainer_belong']).replace('（', '').replace('）', '')
 
         # 生産牧場
-        farm_match = re.search('/breeder/(.+)/">(.+)</a>', str(profile_table[0]))
-        if farm_match != None:
-            horse_info['farm_id'], horse_info['farm_name'] = farm_match.groups()
+        breeder_match = re.search('/breeder/(.+)/">(.+)</a>', str(profile_table[0]))
+        if breeder_match != None:
+            horse_info['breeder_id'], horse_info['breeder_name'] = breeder_match.groups()
 
         return horse_info, True
 
