@@ -2,17 +2,18 @@ import numpy as np
 import math
 import pandas as pd
 import traceback
+import shutil
 
 def main():
     # Excelファイル読み込み
     try:
-        df = read_excel('create_ddl.xlsx', sheet_name='テーブル定義')
+        df = read_excel('create_ddl.xlsx', sheet_name = 'テーブル定義')
     except Exception as e:
         print('テーブル定義書が見つかりません')
 
-    df.columns = [i for i in range(11)]
+    df.columns = [i for i in range(len(df.columns))]
 
-    # Excelから読み込んだパラメータかたCREATE文を組み立てる
+    # Excelから読み込んだパラメータからCREATE文を組み立てる
     try:
         sql = assemble_sql(df)
     except Exception as e:
@@ -20,7 +21,9 @@ def main():
 
     # TODO .sqlへ出力処理
     # TODO Excelファイル名変更
+
     # TODO templateからファイルコピー
+   
 
 def read_excel():
     '''Excelファイルを読み込む'''
@@ -68,11 +71,19 @@ def assemble_sql(df):
         if not nan_check(row[1][9]): ddl += f'COMMENT \'{row[1][9]}\''
 
         ddl += ',\n'
+    '''
+    for index, column in enumerate(df.iteritems()):
+   
+        # TODO 主キー・複合キー・外部キー処理
+        if column[][] == '○':
+            ddl += f'PRIMARY KEY ({column[][]}),'
 
-    # TODO 主キー・複合キー・外部キー処理
-    # PRIMARY KEY (order_id, product_id),
-    # FOREIGN KEY (product_id) REFERENCES products (product_id)
-
+        if not nan_check(column[][]):
+            ref_table, ref_column = column[][].split('', '')
+            ddl += f'FOREIGN KEY ({}) REFERENCES {ref_table} ({ref_column})'
+        # PRIMARY KEY (order_id, product_id),
+        # FOREIGN KEY (product_id) REFERENCES products (product_id)
+    '''
     # COLLATIONは「utf8mb4_general_ci」固定
     ddl += ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;'
 
