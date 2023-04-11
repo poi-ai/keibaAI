@@ -13,7 +13,8 @@ class Base:
             self.logger = log.Logger(Path(inspect.stack()[1].filename).stem)
 
     def error_output(self, message, e = None, stacktrace = None, line_flg = True):
-        '''エラー時のログ出力/LINE通知を行う
+        '''
+        エラー時のログ出力/LINE通知を行う
 
         Args:
             message(str) : エラーメッセージ
@@ -33,3 +34,15 @@ class Base:
 
         if line_flg:
             line.send(line_message)
+
+    def validate_error(self, column_name, message):
+        '''
+        バリデーションチェックに引っかかったときのログ出力を行う
+
+        Args:
+            columns_name(srt): カラム名
+            message(str) : エラーメッセージ
+
+        '''
+        classname = inspect.currentframe().f_back.f_locals.get('__qualname__')
+        self.logger.error(f'{classname}クラスの{column_name}でエラー {message}')
