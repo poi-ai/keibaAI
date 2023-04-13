@@ -4,7 +4,7 @@ import traceback
 import re
 from base import Base
 
-class Result(Base):
+class RaceResult(Base):
     '''JBISのサイトからレース結果を取得する'''
     def __init__(self, race_date, course_id, race_no):
         super().__init__()
@@ -239,118 +239,205 @@ class Result(Base):
         return race_result_info, True
 
     def get_horse_result(self, soup):
-        '''レース結果情報を取得
+        '''
+        レース結果情報を取得
 
         Args:
             soup(bs4.BeautifulSoup): レース結果ページのHTML
 
         Returns:
+            race_result_info_list(list[dict{},...]): 馬別のレース結果情報
+                ・rank()
+                ・frame_no()
+                ・horse_no()
+                ・horse_id()
+                ・horse_name()
+                ・father_id()
+                ・father_name()
+                ・mother_id()
+                ・mother_name()
+                ・select_sale_year()
+                ・select_sale_id()
+                ・select_sale_name()
+                ・select_sale_price()
+                ・gender()
+                ・age()
+                ・jockey_id()
+                ・jockey_name()
+                ・load()
+                ・goal_time()
+                ・diff()
+                ・pass_rank()
+                ・agari()
+                ・sp_shisu()
+                ・popular()
+                ・weight()
+                ・weight_change()
+                ・trainer_id()
+                ・trainer_name()
+                ・trainer_belong()
+                ・owner_id()
+                ・owner_name()
+                ・breeder_id()
+                ・breeder_name()
+            bool: 処理結果
 
         '''
+        race_result_info_list = []
 
         # レース結果テーブルからデータ取得
         # リンクから各種IDをとるためpd.read_htmlは使わない
         result_tables = soup.find_all('table', class_ = 'tbl-data-04 cell-align-c')
         if len(result_tables) == 0:
             self.logger.error('JBISレース結果ページで結果テーブルの取得に失敗しました')
-            return
+            return None, False
         elif len(result_tables) >= 2:
             self.logger.warning('JBISレース結果ページで結果テーブルが複数見つかりました。最初のタグから抽出を行います。')
 
         # 各行(=各馬)ごとにデータを取得する
         for row_index, tr in enumerate(result_tables[0].find_all('tr')):
+            race_result_info = {
+                'rank': '',
+                'frame_no': '',
+                'horse_no': '',
+                'horse_id': '',
+                'horse_name': '',
+                'father_id': '',
+                'father_name': '',
+                'mother_id': '',
+                'mother_name': '',
+                'select_sale_year': '',
+                'select_sale_id': '',
+                'select_sale_name': '',
+                'select_sale_price': '',
+                'gender': '',
+                'age': '',
+                'jockey_id': '',
+                'jockey_name': '',
+                'load': '',
+                'goal_time': '',
+                'diff': '',
+                'pass_rank': '',
+                'agari': '',
+                'sp_shisu': '',
+                'popular': '',
+                'weight': '',
+                'weight_change': '',
+                'trainer_id': '',
+                'trainer_name': '',
+                'trainer_belong': '',
+                'owner_id': '',
+                'owner_name': '',
+                'breeder_id': '',
+                'breeder_name': ''
+            }
+
             # 最初の行はカラム名なので飛ばす
             if row_index == 0: continue
 
             # 着順取得
-            self.rank = mold.rm(tr.find('th').text)
+            race_result_info['rank'] = mold.rm(tr.find('th').text)
 
             # 列を行ごとに区切って対応するデータを取得
             td = tr.find_all('td')
 
             # 枠番、馬番取得
-            self.frame_no = mold.rm(td[0].text)
-            self.horse_no = mold.rm(td[1].text)
+            race_result_info['frame_no'] = mold.rm(td[0].text)
+            race_result_info['horse_no'] = mold.rm(td[1].text)
 
             # 競走馬ID、競走馬名取得 TODO 出身国、ブリンカー、地方マーク取得
             horse_id_match = re.search('<a href="/horse/(.+)/"><em>(.+)</em>', str(td[2]))
             if horse_id_match is None:
                 self.logger.error('JBISレース結果ページで競走馬IDの取得に失敗しました')
             else:
-                self.horse_id, self.horse_name = horse_id_match.groups()
+                race_result_info['horse_id'], race_result_info['horse_name'] = horse_id_match.groups()
 
             # 父名・母名・セレクトセール情報取得
             for li in td[2].find_all('li'):
                 # 父名
                 father_match = re.search('父：<a href="/horse/(.+)/">(.+)</a>', str(li))
                 if father_match != None:
-                    self.father_id, self.father_name = father_match.groups()
+                    race_result_info['father_id'], race_result_info['father_name'] = father_match.groups()
 
                 # 母名
                 mother_match = re.search('母：<a href="/horse/(.+)/">(.+)</a>', str(li))
                 if mother_match != None:
-                    self.mother_id, self.mother_name = mother_match.groups()
+                    race_result_info['mother_id'], race_result_info['mother_name'] = mother_match.groups()
 
                 # セレクトセール情報
                 select_sale_match = re.search('<a href="/seri/(.+)/(.+)/">(.+)</a>', str(li))
                 if select_sale_match != None:
-                    self.select_sale_year, self.select_sale_id, self.select_sale_name = select_sale_match.groups()
+                    race_result_info['select_sale_year'], race_result_info['select_sale_id'], race_result_info['select_sale_name'] = select_sale_match.groups()
 
                 select_sale_price_match = re.search('(\d+)\.(\d+)万円', str(li))
                 if select_sale_price_match != None:
-                    self.select_sale_price = str(int(select_sale_price_match.groups()[0]) * 10000 + int(select_sale_price_match.groups()[1]) * 1000)
+                    race_result_info['select_sale_price'] = str(int(select_sale_price_match.groups()[0]) * 10000 + int(select_sale_price_match.groups()[1]) * 1000)
 
             # 性別・馬齢
-            self.gender= td[3].text[:1]
-            self.age = td[3].text[1:]
+            race_result_info['gender'] = td[3].text[:1]
+            race_result_info['age'] = td[3].text[1:]
 
             # 騎手ID・騎手名・斤量 TODO 減量マーク取得
             jockey_match = re.search('"/race/jockey/(.+)/">(.+)</a><br/>(\d\d\.\d)</td>', str(td[4]))
             if jockey_match != None:
-                self.jockey_id, self.jockey_name, self.load = jockey_match.groups()
+                race_result_info['jockey_id'], race_result_info['jockey_name'], race_result_info['load'] = jockey_match.groups()
 
             # 走破タイム・着差・通過順位・上がり3F・スピード指数・人気
-            self.goal_time = mold.change_seconds(td[5].text)
-            self.diff = td[6].text
-            self.pass_rank = td[7].text
-            self.agari = td[8].text
-            self.sp_shisu = td[9].text
-            self.popular = td[10].text
+            race_result_info['goal_time'] = mold.change_seconds(td[5].text)
+            race_result_info['diff'] = td[6].text
+            race_result_info['pass_rank'] = td[7].text
+            race_result_info['agari'] = td[8].text
+            race_result_info['sp_shisu'] = td[9].text
+            race_result_info['popular'] = td[10].text
 
             # 馬体重・馬体重増減
             weight_match = re.search('<td>(.+)<br/>（(.+)）</td>', str(td[11]))
             if weight_match != None:
-                self.weight, self.weight_change = weight_match.groups()
+                race_result_info['weight'], race_result_info['weight_change'] = weight_match.groups()
 
             # 調教師ID・調教師名・調教師所属
             trainer_match = re.search('<a href="/race/trainer/(.+)/">(.+)</a><br/>（(.+)）', str(td[12]))
             if trainer_match != None:
-                self.trainer_id, self.trainer_name, self.trainer_belong = trainer_match.groups()
+                race_result_info['trainer_id'], race_result_info['trainer_name'], race_result_info['trainer_belong'] = trainer_match.groups()
 
             # 馬主ID・馬主名
             owner_match = re.search('<a href="/race/owner/(.+)/">(.+)</a><br/>', str(td[13]))
             if owner_match != None:
-                self.owner_id, self.owner_name = owner_match.groups()
+                race_result_info['owner_id'], race_result_info['owner_name'] = owner_match.groups()
 
             # 生産牧場ID・生産牧場名
             breeder_match = re.search('<a href="/breeder/(.+)/">(.+)</a>', str(td[13]))
             if breeder_match != None:
-                self.breeder_id, self.breeder_name = breeder_match.groups()
+                race_result_info['breeder_id'], race_result_info['breeder_name'] = breeder_match.groups()
+
+            race_result_info_list.append(race_result_info)
+
+        return race_result_info_list, True
 
     def get_lap(self, soup):
-        '''ラップタイムを取得する
+        '''
+        ラップタイムを取得する
 
         Args:
             soup(bs4.BeautifulSoup): レース結果ページのHTML
 
         Returns:
+            lap_info_list(dict): レースのラップ情報
+                ・agari_4f(先頭馬上がり3F)
+                ・agari_3f(先頭馬)
+                ・lap_time(先頭馬ラップタイム)
 
         '''
+        lap_info = {
+            'agari_4f': '',
+            'agari_3f': '',
+            'lap_time': ''
+        }
 
         # ラップタイムテーブルの存在チェック
         if '<h3 class="hdg-l3-01"><span>タイム</span></h3>' not in str(soup):
             self.logger.info('ラップタイムテーブルが存在しません')
-            return
+            return None
 
         # テーブル一覧を取得
         tables = soup.find_all('table', class_ = 'tbl-data-05')
@@ -360,26 +447,41 @@ class Result(Base):
 
         # 一行ずつチェック
         for tr in lap_time_table.find_all('tr'):
+
             if tr.find('th').text == '上がり':
-                self.agari_4f, self.agari_3f = mold.rm_nl(tr.find('td').text).split('-')
+                lap_info['agari_4f'], lap_info['agari_3f'] = mold.rm_nl(tr.find('td').text).split('-')
 
             if tr.find('th').text == 'ハロンタイム':
-                self.lap_time = tr.find('td').text
+                lap_info['lap_time'] = tr.find('td').text
+
+        return lap_info
 
     def get_corner_rank(self, soup):
-        '''コーナー通過順位を取得する
+        '''
+        コーナー通過順位を取得する
 
         Args:
             soup(bs4.BeautifulSoup): レース結果ページのHTML
 
         Returns:
+            corner_rank(dict): 各コーナーの通過順位
+                ・corner1_rank(第1コーナーの通過順位)
+                ・corner2_rank(第2コーナーの通過順位)
+                ・corner3_rank(第3コーナーの通過順位)
+                ・corner4_rank(第4コーナーの通過順位)
 
         '''
+        corner_rank = {
+            'corner1_rank': '',
+            'corner2_rank': '',
+            'corner3_rank': '',
+            'corner4_rank': '',
+        }
 
         # ラップタイムテーブルの存在チェック
         if '<h3 class="hdg-l3-01"><span>コーナー通過順位</span></h3>' not in str(soup):
             self.logger.info('コーナー通過順位テーブルが存在しません')
-            return
+            return None
 
         # テーブル一覧を取得
         tables = soup.find_all('table', class_ = 'tbl-data-05')
@@ -393,13 +495,15 @@ class Result(Base):
         # 一行ずつチェック
         for tr in corner_rank_table.find_all('tr'):
             if tr.find('th').text == '1コーナー':
-                self.corner1_rank = mold.rm_nl(tr.find('td').text).replace(',', '|')
+                corner_rank['corner1_rank'] = mold.rm_nl(tr.find('td').text).replace(',', '|')
 
             if tr.find('th').text == '2コーナー':
-                self.corner2_rank = mold.rm_nl(tr.find('td').text).replace(',', '|')
+                corner_rank['corner2_rank'] = mold.rm_nl(tr.find('td').text).replace(',', '|')
 
             if tr.find('th').text == '3コーナー':
-                self.corner3_rank = mold.rm_nl(tr.find('td').text).replace(',', '|')
+                corner_rank['corner3_rank'] = mold.rm_nl(tr.find('td').text).replace(',', '|')
 
             if tr.find('th').text == '4コーナー':
-                self.corner4_rank = mold.rm_nl(tr.find('td').text).replace(',', '|')
+                corner_rank['corner4_rank'] = mold.rm_nl(tr.find('td').text).replace(',', '|')
+
+        return corner_rank
