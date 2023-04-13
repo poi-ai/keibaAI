@@ -6,10 +6,10 @@ from base import Base
 
 class Result(Base):
     '''JBISのサイトからレース結果を取得する'''
-    def __init__(self, date, baba_id, race_no):
+    def __init__(self, race_date, course_id, race_no):
         super().__init__()
-        self.date = date
-        self.baba_id = baba_id
+        self.race_date = race_date
+        self.course_id = course_id
         self.race_no = race_no
 
     def main(self):
@@ -42,34 +42,88 @@ class Result(Base):
         except Exception as e:
             self.error_output('コーナー通過順位取得処理でエラー', e, traceback.format_exc())
 
-    def get_soup(self):
+    def get_soup(self, race_date = None, course_id = None, race_no = None):
         '''
-        指定したJBIS競走馬IDのレース結果ページのHTMLをbs4型で取得する
+        指定したJBISレースIDのレース結果ページのHTMLをbs4型で取得する
 
         Args:
 
         Returns:
             soup(bs4.BeautifulSoup): レース結果ページのHTML
-            exist(bool): 指定した競走馬IDが存在するか
+            exist(int): 指定したレースIDが存在するか
+                1: 存在している
+                2: 存在しているが、レース結果が出ていない
+                3: 存在しない
 
         '''
+        # 各パラメータが引数で指定されていなければインスタンス変数から持ってくる
+        if race_date == None: race_date = self.race_date
+        if course_id == None: course_id = self.course_id
+        if race_no == None: race_no = self.race_no
 
-        soup = gethtml.soup(f'https://www.jbis.or.jp/race/result/{self.race_date}/{self.course_id}/{self.race_no}/')
+        # HTML取得
+        soup = gethtml.soup(f'https://www.jbis.or.jp/race/result/{race_date}/{course_id}/{race_no}/')
 
-        # 存在しないページチェック
-        if '指定されたＵＲＬのページは存在しません。' in str(soup):
-            return None, False
+        # 結果公開/未公開チェック
+        if '該当するデータは存在しません' in str(soup): return 2
 
-        return soup, True
+        # レースID存在チェック
+        if '指定されたＵＲＬのページは存在しません。' in str(soup): return 3
+
+        return soup, 1
 
     def get_race_summary(self, soup):
-        '''レース概要を取得'''
+        '''
+        レース概要を取得
+
+        Args:
+            soup(bs4.BeautifulSoup): レース結果ページのHTML
+
+        Returns:
+            race_result_info(dict): レース情報
+                ・race_name(レース名)
+                ・race_type(レース馬場区分[芝/ダート])
+                ・distance(距離)
+                ・age_term(出走条件[馬齢])
+                ・country_term(出走条件[国籍])
+                ・local_term(出走条件[地方馬])
+                ・load_type(斤量種別)
+                ・gender_term(出走条件[性別])
+                ・weather(天候)
+                ・grass_condition(芝の馬場状態)
+                ・dirt_condition(ダートの馬場状態)
+                ・first_prize(1着賞金)
+                ・second_prize(2着賞金)
+                ・third_prize(3着賞金)
+                ・fourth_prize(4着賞金)
+                ・fifth_prize(5着賞金)
+            bool: 処理結果
+
+        '''
+        race_result_info = {
+            'race_name': '',
+            'race_type': '',
+            'distance': '',
+            'age_term': '',
+            'country_term': '',
+            'local_term': '',
+            'load_type': '',
+            'gender_term': '',
+            'weather': '',
+            'grass_condition': '',
+            'dirt_condition': '',
+            'first_prize': '',
+            'second_prize': '',
+            'third_prize': '',
+            'fourth_prize': '',
+            'fifth_prize': ''
+        }
 
         # ヘッダのレース番号・レース名を取得
         race_header = soup.find_all('div', class_ = 'hdg-l2-06-container')
         if len(race_header) == 0:
             self.logger.error('JBISレース結果ページでタイトルの取得に失敗しました')
-            return
+            return None, False
         elif len(race_header) >= 2:
             self.logger.warning('JBISレース結果ページでタイトルクラスが複数見つかりました。最初のタグから抽出を行います。')
 
@@ -78,7 +132,7 @@ class Result(Base):
         if race_name == None:
             self.logger.error('JBISレース結果ページでレース名の取得に失敗しました')
         else:
-            self.race_name = race_name.groups()[0].strip()
+            race_result_info['race_name'] = race_name.groups()[0].strip()
 
         # タイトルの横につく画像からTODOを取得
         str_race_header = str(race_header)
@@ -97,7 +151,7 @@ class Result(Base):
         if course_summary == None:
             self.logger.error('JBISレース結果ページでコース情報の取得に失敗しました')
         else:
-            self.race_type, self.distance = course_summary.groups()
+            race_result_info['race_type'], race_result_info['distance'] = course_summary.groups()
 
         # レース条件
         race_condition_summary = str(race_summary[0].find_all('li', class_ = 'first-child')[0])
@@ -108,84 +162,91 @@ class Result(Base):
             self.logger.error('JBISレース結果ページで馬齢条件の取得に失敗しました')
         else:
             if age_term_match.groups()[1] == '上':
-                self.age_term = mold.full_to_half(age_term_match.groups()[0]) + '歳上'
+                race_result_info['age_term'] = mold.full_to_half(age_term_match.groups()[0]) + '歳上'
             else:
-                self.age_term = mold.full_to_half(age_term_match.groups()[0]) + '歳'
+                race_result_info['age_term'] = mold.full_to_half(age_term_match.groups()[0]) + '歳'
 
         # 国籍条件
         if '（国際）' in race_condition_summary:
-            self.country_term = '国際'
+            race_result_info['country_term'] = '国際'
         elif '（混合）' in race_condition_summary:
-            self.country_term = '混合'
+            race_result_info['country_term'] = '混合'
 
         # 地方条件
         if '（特指）' in race_condition_summary:
-            self.local_term = '特指'
+            race_result_info['local_term'] = '特指'
         elif '（指定）' in race_condition_summary: # TODO カク指、マル指
-            self.local_term = '指定'
+            race_result_info['local_term'] = '指定'
 
-        # 斤量条件
+        # 斤量種別
         if '定量' in race_condition_summary:
-            self.load_type = '定量'
+            race_result_info['load_type'] = '定量'
         elif '馬齢' in race_condition_summary:
-            self.load_type = '馬齢'
+            race_result_info['load_type'] = '馬齢'
         elif '別定' in race_condition_summary:
-            self.load_type = '別定'
+            race_result_info['load_type'] = '別定'
         elif 'ハンデ' in race_condition_summary:
-            self.load_type = 'ハンデ'
+            race_result_info['load_type'] = 'ハンデ'
 
         # 性別条件
         if '牡・牝' in race_condition_summary:
-            self.gender_term = '牡牝'
+            race_result_info['gender_term'] = '牡牝'
         elif '牝' in race_condition_summary:
-            self.gender_term = '牝'
+            race_result_info['gender_term'] = '牝'
 
         # クラス名のないliタグ内から情報取得
         for li in race_summary[0].find_all('li'):
             # 天候
             weather_match = re.search('天候：(.+)</li>', str(li))
             if weather_match != None:
-                self.weather = mold.rm(weather_match.groups()[0])
+                race_result_info['weather'] = mold.rm(weather_match.groups()[0])
 
             # 馬場状態(芝)
             grass_condition_match = re.search('芝：(.+)</li>', str(li))
             if grass_condition_match != None:
-                self.grass_condition = mold.rm(grass_condition_match.groups()[0])
+                race_result_info['grass_condition'] = mold.rm(grass_condition_match.groups()[0])
 
             # 馬場状態(ダ) TODO match条件確認(ダかダートか)
             dirt_condition_match = re.search('ダート：(.+)</li>', str(li))
             if dirt_condition_match != None:
-                self.dirt_condition = mold.rm(dirt_condition_match.groups()[0])
+                race_result_info['dirt_condition'] = mold.rm(dirt_condition_match.groups()[0])
 
             # 1着賞金
             first_prize_match = re.search('1着：(.+)円', str(li))
             if first_prize_match != None:
-                self.first_prize = first_prize_match.groups()[0].replace(',', '')
+                race_result_info['first_prize'] = first_prize_match.groups()[0].replace(',', '')
 
             # 2着賞金
             second_prize_match = re.search('2着：(.+)円', str(li))
             if second_prize_match != None:
-                self.second_prize = second_prize_match.groups()[0].replace(',', '')
+                race_result_info['second_prize'] = second_prize_match.groups()[0].replace(',', '')
 
             # 3着賞金
             third_prize_match = re.search('3着：(.+)円', str(li))
             if third_prize_match != None:
-                self.third_prize = third_prize_match.groups()[0].replace(',', '')
+                race_result_info['third_prize'] = third_prize_match.groups()[0].replace(',', '')
 
             # 4着賞金
             fourth_prize_match = re.search('4着：(.+)円', str(li))
             if fourth_prize_match != None:
-                self.fourth_prize = fourth_prize_match.groups()[0].replace(',', '')
+                race_result_info['fourth_prize'] = fourth_prize_match.groups()[0].replace(',', '')
 
             # 5着賞金
             fifth_prize_match = re.search('5着：(.+)円', str(li))
             if fifth_prize_match != None:
-                self.fifth_prize = fifth_prize_match.groups()[0].replace(',', '')
+                race_result_info['fifth_prize'] = fifth_prize_match.groups()[0].replace(',', '')
 
-        return
+        return race_result_info, True
 
     def get_horse_result(self, soup):
-        '''レース結果情報を取得'''
+        '''レース結果情報を取得
+
+        Args:
+            soup(bs4.BeautifulSoup): レース結果ページのHTML
+
+        Returns:
+
+        '''
 
         # レース結果テーブルからデータ取得
         # リンクから各種IDをとるためpd.read_htmlは使わない
@@ -277,7 +338,14 @@ class Result(Base):
                 self.breeder_id, self.breeder_name = breeder_match.groups()
 
     def get_lap(self, soup):
-        '''ラップタイムを取得する'''
+        '''ラップタイムを取得する
+
+        Args:
+            soup(bs4.BeautifulSoup): レース結果ページのHTML
+
+        Returns:
+
+        '''
 
         # ラップタイムテーブルの存在チェック
         if '<h3 class="hdg-l3-01"><span>タイム</span></h3>' not in str(soup):
@@ -299,7 +367,14 @@ class Result(Base):
                 self.lap_time = tr.find('td').text
 
     def get_corner_rank(self, soup):
-        '''コーナー通過順位を取得する'''
+        '''コーナー通過順位を取得する
+
+        Args:
+            soup(bs4.BeautifulSoup): レース結果ページのHTML
+
+        Returns:
+
+        '''
 
         # ラップタイムテーブルの存在チェック
         if '<h3 class="hdg-l3-01"><span>コーナー通過順位</span></h3>' not in str(soup):

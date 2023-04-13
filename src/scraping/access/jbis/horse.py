@@ -10,7 +10,7 @@ class Horse(Base):
         self.horse_id = horse_id
 
     def main(self):
-        '''主処理 TODO 後で消す
+        '''主処理 TODO 後で移行する
 
         Returns:
             bool: 処理結果
