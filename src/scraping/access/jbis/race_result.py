@@ -47,6 +47,9 @@ class RaceResult(Base):
         指定したJBISレースIDのレース結果ページのHTMLをbs4型で取得する
 
         Args:
+            race_date(str): 対象レースのレース日
+            course_id(str): 対象レースのJBIS競馬場ID
+            race_no(str): 対象レースのレース番号
 
         Returns:
             soup(bs4.BeautifulSoup): レース結果ページのHTML
@@ -247,39 +250,39 @@ class RaceResult(Base):
 
         Returns:
             race_result_info_list(list[dict{},...]): 馬別のレース結果情報
-                ・rank()
-                ・frame_no()
-                ・horse_no()
-                ・horse_id()
-                ・horse_name()
-                ・father_id()
-                ・father_name()
-                ・mother_id()
-                ・mother_name()
-                ・select_sale_year()
-                ・select_sale_id()
-                ・select_sale_name()
-                ・select_sale_price()
-                ・gender()
-                ・age()
-                ・jockey_id()
-                ・jockey_name()
-                ・load()
-                ・goal_time()
-                ・diff()
-                ・pass_rank()
-                ・agari()
-                ・sp_shisu()
-                ・popular()
-                ・weight()
-                ・weight_change()
-                ・trainer_id()
-                ・trainer_name()
-                ・trainer_belong()
-                ・owner_id()
-                ・owner_name()
-                ・breeder_id()
-                ・breeder_name()
+                ・rank(着順)
+                ・frame_no(枠番)
+                ・horse_no(馬番)
+                ・horse_id(JBIS競走馬ID)
+                ・horse_name(馬名)
+                ・father_id(父のJBIS競走馬ID)
+                ・father_name(父の名前)
+                ・mother_id(母のJBIS競走馬ID)
+                ・mother_name(母の名前)
+                ・select_sale_year(セレクトセールが行われた年)
+                ・select_sale_id(取引されたJIBSセレクトセールID)
+                ・select_sale_name(セレクトセール名)
+                ・select_sale_price(セレクトセールでの取引額)
+                ・gender(性別)
+                ・age(馬齢)
+                ・jockey_id(騎手JBISID)
+                ・jockey_name(騎手名)
+                ・load(斤量)
+                ・goal_time(走破タイム)
+                ・diff(着差)
+                ・pass_rank(コーナー通過順位)
+                ・agari(上がり3F)
+                ・sp_shisu(スピード指数)
+                ・popular(単勝人気)
+                ・weight(馬体重)
+                ・weight_change(馬体重増減)
+                ・trainer_id(調教師JBISID)
+                ・trainer_name(調教師名)
+                ・trainer_belong(調教師所属)
+                ・owner_id(馬主JBISID)
+                ・owner_name(馬主名)
+                ・breeder_id(生産牧場JBISID)
+                ・breeder_name(生産牧場名)
             bool: 処理結果
 
         '''
