@@ -16,7 +16,7 @@ class RaceResult(Base):
         '''主処理 TODO 後で消す'''
 
         # HTMLファイルからデータ取得
-        soup = self.get_soup()
+        soup, exist = self.get_soup()
 
         # レース概要を取得
         try:
@@ -425,7 +425,7 @@ class RaceResult(Base):
             soup(bs4.BeautifulSoup): レース結果ページのHTML
 
         Returns:
-            lap_info_list(dict): レースのラップ情報
+            lap_info_list(dict) or None: レースのラップ情報
                 ・agari_4f(先頭馬上がり3F)
                 ・agari_3f(先頭馬)
                 ・lap_time(先頭馬ラップタイム)
@@ -467,7 +467,7 @@ class RaceResult(Base):
             soup(bs4.BeautifulSoup): レース結果ページのHTML
 
         Returns:
-            corner_rank(dict): 各コーナーの通過順位
+            corner_rank(dict) or None: 各コーナーの通過順位
                 ・corner1_rank(第1コーナーの通過順位)
                 ・corner2_rank(第2コーナーの通過順位)
                 ・corner3_rank(第3コーナーの通過順位)
