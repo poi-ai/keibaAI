@@ -70,20 +70,20 @@ class RaceTable(Base):
 
         Reutrns:
             race_info(dict): レース情報
-                ・race_name()
-                ・horse_class()
-                ・race_type()
-                ・distance()
-                ・age_term()
-                ・country_term()
-                ・local_term()
-                ・load_type()
-                ・gender_term()
-                ・first_prize()
-                ・second_prize()
-                ・third_prize()
-                ・fourth_prize()
-                ・fifth_prize()
+                ・race_name(レース名)
+                ・horse_class(レースのクラス)
+                ・race_type(レース馬場区分[芝/ダート])
+                ・distance(距離)
+                ・age_term(出走条件[馬齢])
+                ・country_term(出走条件[国籍])
+                ・local_term(出走条件[地方馬])
+                ・load_type(斤量種別)
+                ・gender_term(出走条件[性別])
+                ・first_prize(1着賞金)
+                ・second_prize(2着賞金)
+                ・third_prize(3着賞金)
+                ・fourth_prize(4着賞金)
+                ・fifth_prize(5着賞金)
             bool: 処理結果
 
         '''
@@ -221,29 +221,29 @@ class RaceTable(Base):
 
         Returns:
             horse_info_list[dict, dict]: 出走馬情報のリスト
-                ・horse_no()
-                ・frame_no()
-                ・gender()
-                ・age()
-                ・hair_color()
-                ・horse_id()
-                ・horse_name()
-                ・trainer_id()
-                ・trainer_name()
-                ・trainer_belong()
-                ・jockey_id()
-                ・jockey()
-                ・load_name()
-                ・owner_id()
-                ・owner_name()
-                ・breeder_id()
-                ・breeder_name()
-                ・father_id()
-                ・father_name()
-                ・mother_id()
-                ・mother()
-                ・mf_id()
-                ・mf_name()
+                ・horse_no(馬番)
+                ・frame_no(枠番)
+                ・gender(性別)
+                ・age(馬齢)
+                ・hair_color(毛色)
+                ・horse_id(JBIS競走馬ID)
+                ・horse_name(馬名)
+                ・trainer_id(調教師のJBISID)
+                ・trainer_name(調教師名)
+                ・trainer_belong(調教師の所属)
+                ・jockey_id(騎手のJBISID)
+                ・jockey_name(騎手名)
+                ・load(斤量)
+                ・owner_id(馬主のJBISID)
+                ・owner_name(馬主名)
+                ・breeder_id(生産牧場のJBISID)
+                ・breeder_name(生産牧場名)
+                ・father_id(父のJBIS競走馬ID)
+                ・father_name(父の名前)
+                ・mother_id(母のJBIS競走馬ID)
+                ・mother_name(母の名前)
+                ・mf_id(母父のJBIS競走馬ID)
+                ・mf_name(母父の名前)
             bool: 処理結果
 
         '''
@@ -273,8 +273,8 @@ class RaceTable(Base):
                 'trainer_name': '',
                 'trainer_belong': '',
                 'jockey_id': '',
-                'jockey': '',
-                'load_name': '',
+                'jockey_name': '',
+                'load': '',
                 'owner_id': '',
                 'owner_name': '',
                 'breeder_id': '',
@@ -282,7 +282,7 @@ class RaceTable(Base):
                 'father_id': '',
                 'father_name': '',
                 'mother_id': '',
-                'mother': '',
+                'mother_name': '',
                 'mf_id': '',
                 'mf_name': ''
             }
