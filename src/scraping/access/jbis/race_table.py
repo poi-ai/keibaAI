@@ -71,7 +71,7 @@ class RaceTable(Base):
         Reutrns:
             race_info(dict): レース情報
                 ・race_name(レース名)
-                ・horse_class(レースのクラス)
+                ・race_class(レースのクラス)
                 ・race_type(レース馬場区分[芝/ダート])
                 ・distance(距離)
                 ・age_term(出走条件[馬齢])
@@ -89,7 +89,7 @@ class RaceTable(Base):
         '''
         race_info = {
             'race_name': '',
-            'horse_class': '',
+            'race_class': '',
             'race_type': '',
             'distance': '',
             'age_term': '',
@@ -117,7 +117,7 @@ class RaceTable(Base):
         if race_name == None:
             self.logger.error('JBIS出走表ページでレース名の取得に失敗しました')
         else:
-            race_info['race_name'], race_info['horse_class'] = race_name.groups()
+            race_info['race_name'], race_info['race_class'] = race_name.groups()
 
         # タイトルの横につく画像からTODOを取得
         str_race_header = str(race_header)

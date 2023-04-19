@@ -85,6 +85,7 @@ class RaceResult(Base):
         Returns:
             race_result_info(dict): レース情報
                 ・race_name(レース名)
+                ・race_class(レースのクラス)
                 ・race_type(レース馬場区分[芝/ダート])
                 ・distance(距離)
                 ・age_term(出走条件[馬齢])
@@ -105,6 +106,7 @@ class RaceResult(Base):
         '''
         race_result_info = {
             'race_name': '',
+            'race_class': '',
             'race_type': '',
             'distance': '',
             'age_term': '',
@@ -131,11 +133,22 @@ class RaceResult(Base):
             self.logger.warning('JBISレース結果ページでタイトルクラスが複数見つかりました。最初のタグから抽出を行います。')
 
         # TODO 間に空白が入ってるレースで調査
-        race_name = re.search(f'{self.race_no}R (.*) ', race_header[0].text)
+        race_name = re.search(f'{int(self.race_no)}R (.+)　(.+)', race_header[0].text)
         if race_name == None:
-            self.logger.error('JBISレース結果ページでレース名の取得に失敗しました')
+
+            race_name = re.search(f'{int(self.race_no)}R (.+)', race_header[0].text)
+            if race_name == None:
+                self.logger.error('JBISレース結果ページでレース名の取得に失敗しました')
+                self.logger.info(str(race_header[0]))
+            else:
+                race_result_info['race_name'] = race_name.groups()[0].strip()
+                self.logger.info('-------------------------------')
+                self.logger.info('レース名は取れた。クラスは取れない')
+                self.logger.info(race_header.find_all('img')[0])
+                self.logger.info('-------------------------------')
         else:
             race_result_info['race_name'] = race_name.groups()[0].strip()
+            race_result_info['race_class'] = race_name.groups()[1].strip()
 
         # タイトルの横につく画像からTODOを取得
         str_race_header = str(race_header)
@@ -159,10 +172,11 @@ class RaceResult(Base):
         # レース条件
         race_condition_summary = str(race_summary[0].find_all('li', class_ = 'first-child')[0])
 
-        # 馬齢条件
+        # 馬齢条件 TODO ない場合が多い、要調査
         age_term_match = re.search('サラ系(.)歳(.)', race_condition_summary)
         if age_term_match == None:
-            self.logger.error('JBISレース結果ページで馬齢条件の取得に失敗しました')
+            pass
+            #self.logger.error(f'JBISレース結果ページで馬齢条件の取得に失敗しました https://www.jbis.or.jp/race/result/{self.race_date}/{self.course_id}/{self.race_no}/')
         else:
             if age_term_match.groups()[1] == '上':
                 race_result_info['age_term'] = mold.full_to_half(age_term_match.groups()[0]) + '歳上'
@@ -377,7 +391,11 @@ class RaceResult(Base):
                     race_result_info['select_sale_price'] = str(int(select_sale_price_match.groups()[0]) * 10000 + int(select_sale_price_match.groups()[1]) * 1000)
 
             # 性別・馬齢
-            race_result_info['gender'] = td[3].text[:1]
+            try:
+                race_result_info['gender'] = td[3].text[:1]
+            except:
+                self.logger.error(f'https://www.jbis.or.jp/race/result/{self.race_date}/{self.course_id}/{self.race_no}/ horse_no:{race_result_info["horse_no"]}')
+                self.logger.error(str(td))
             race_result_info['age'] = td[3].text[1:]
 
             # 騎手ID・騎手名・斤量 TODO 減量マーク取得

@@ -16,10 +16,10 @@ def export_dict_to_csv(data_dict, file_name):
     '''
     try:
         # ファイルが既に存在するか確認
-        file_exists = os.path.isfile(file_name)
+        file_exists = os.path.isfile(os.path.join('csv', file_name))
 
         # ファイルをUTF-8で開き、追記モードで書き込む
-        with open(file_name, 'a', newline='', encoding='utf-8') as csv_file:
+        with open(os.path.join('csv', file_name), 'a', newline='', encoding='utf-8') as csv_file:
             writer = csv.writer(csv_file)
 
             # ファイルが存在しない場合は、キーをファイルの最初の行に書き込む
@@ -36,7 +36,7 @@ def export_dict_to_csv(data_dict, file_name):
         # ファイル書き込み時にエラーが発生したこととエラーメッセージを返す
         return False, str(e)
 
-OLDEST_DATE = '20200101'
+OLDEST_DATE = '20230320'
 LATEST_DATE = '20230401'
 
 c = racing_calendar.Calendar(OLDEST_DATE, LATEST_DATE)
