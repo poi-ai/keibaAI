@@ -66,6 +66,7 @@ class NowOdds(Base):
     def create_instance(self):
         '''インスタンスの生成を行う'''
 
+
         # 中央競馬用インスタンス作成
         try:
             jra = jraodds()
@@ -214,3 +215,6 @@ class NowOdds(Base):
             if self.nar_flg:
                 if len(self.nar.write_data) != 0:
                     self.nar.record_odds()
+
+    def test(self):
+        pass
