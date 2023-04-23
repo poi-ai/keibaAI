@@ -20,7 +20,7 @@ class RaceList(Base):
 
     def get(self):
         '''
-        指定条件に合致するレースID一覧を取得する
+        指定条件に合致するレースID一覧を取得する TODO 後で移植
 
         Returns:
             race_id_list(list) or None: レースID一覧
@@ -102,7 +102,6 @@ class RaceList(Base):
 
         # HTML取得
         soup = gethtml.soup(url)
-
         # 開催IDのリンクはli属性内にあるのでliを取得
         li = soup.find_all('li')
 

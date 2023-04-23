@@ -32,7 +32,10 @@ class Calendar(Base):
             year, month = year_and_month[:4], year_and_month[4:]
 
             # HTML取得
-            soup = self.get_soup(year, month)
+            try:
+                soup = self.get_soup(year, month)
+            except Exception as e:
+                self.error_input('', e, traceback)
 
             # 指定月の開催日をすべて取得
             month_date_list = self.get_date(soup, year, month)
@@ -52,13 +55,15 @@ class Calendar(Base):
         '''レーシングカレンダーのリンクから開催日を取得する
 
         Args:
-            soup(bs4.BeautifulSoup) : 対象ページのHTML
             year(str): 対象の年
             month(str): 対象の月
 
         Returns:
             date_list(list[開催日(yyyyMMdd), 開催日(yyyyMMdd),...]): 指定年月の全開催日のリスト
         '''
+
+        # HTMLを取得
+        soup = gethtml.soup(f'')
 
         # aタグを取得
         links = soup.find_all('a')
