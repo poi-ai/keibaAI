@@ -22,7 +22,8 @@ class Calendar(Base):
         '''netkeibaのレーシングカレンダーページから開催の取得を行う
 
         Return:
-            date_list(list[開催日(yyyyMMdd), 開催日(yyyyMMdd),...]): 指定期間内の開催日のリスト
+            date_list(list[開催日(yyyyMMdd),...]) or None: 指定期間内の開催日のリスト
+            bool: 実行結果 
 
         '''
         date_list = []
@@ -32,33 +33,33 @@ class Calendar(Base):
             year, month = year_and_month[:4], year_and_month[4:]
 
             # HTML取得
-            soup = self.get_soup(year, month)
-
-            # 指定月の開催日をすべて取得
-            month_date_list = self.get_date(soup, year, month)
+            try:
+                # 指定月の開催日をすべて取得
+                month_date_list = self.get_date(soup, year, month)
+            except Exception as e:
+                self.error_input(f'netkeibaレースカレンダーHTMLの取得に失敗しました {year}年{month}月', e, traceback.format_exc())
+                return None, False
 
             # 月の開催日から指定期間に含まれない開催日を除去
             extraction_date_list = self.extraction_date(month_date_list)
 
             date_list.append(extraction_date_list)
 
-        return list(itertools.chain.from_iterable(date_list))
-
-    def get_soup(self, year, month):
-        '''指定ページした年月(yyyymm型)のcalendarページのHTMLを取得'''
-        return gethtml.soup(f'https://race.netkeiba.com/top/calendar.html?year={year}&month={month}')
+        return list(itertools.chain.from_iterable(date_list)), True
 
     def get_date(self, soup, year, month):
         '''レーシングカレンダーのリンクから開催日を取得する
 
         Args:
-            soup(bs4.BeautifulSoup) : 対象ページのHTML
             year(str): 対象の年
             month(str): 対象の月
 
         Returns:
             date_list(list[開催日(yyyyMMdd), 開催日(yyyyMMdd),...]): 指定年月の全開催日のリスト
         '''
+
+        # HTMLを取得
+        soup = gethtml.soup(f'https://race.netkeiba.com/top/calendar.html?year={year}&month={month}')
 
         # aタグを取得
         links = soup.find_all('a')
