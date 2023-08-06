@@ -2,6 +2,7 @@ import gethtml
 import itertools
 import jst
 import re
+import traceback
 from base import Base
 
 class Calendar(Base):
@@ -19,11 +20,12 @@ class Calendar(Base):
         self.latest_date = latest_date
 
     def get(self):
-        '''netkeibaのレーシングカレンダーページから開催の取得を行う
+        '''
+        netkeibaのレーシングカレンダーページから開催の取得を行う
 
         Return:
             date_list(list[開催日(yyyyMMdd),...]) or None: 指定期間内の開催日のリスト
-            bool: 実行結果 
+            bool: 実行結果
 
         '''
         date_list = []
@@ -35,9 +37,11 @@ class Calendar(Base):
             # HTML取得
             try:
                 # 指定月の開催日をすべて取得
-                month_date_list = self.get_date(soup, year, month)
+                self.logger.info(f'netkeibaレースカレンダーの開催日取得開始 {year}年{month}月')
+                month_date_list = self.get_date(year, month)
+                self.logger.info(f'netkeibaレースカレンダーの開催日取得終了 {year}年{month}月')
             except Exception as e:
-                self.error_input(f'netkeibaレースカレンダーHTMLの取得に失敗しました {year}年{month}月', e, traceback.format_exc())
+                self.error_input(f'netkeibaレースカレンダーの開催日取得に失敗しました {year}年{month}月', e, traceback.format_exc())
                 return None, False
 
             # 月の開催日から指定期間に含まれない開催日を除去
@@ -48,7 +52,8 @@ class Calendar(Base):
         return list(itertools.chain.from_iterable(date_list)), True
 
     def get_date(self, soup, year, month):
-        '''レーシングカレンダーのリンクから開催日を取得する
+        '''
+        レーシングカレンダーのリンクから開催日を取得する
 
         Args:
             year(str): 対象の年
@@ -83,7 +88,8 @@ class Calendar(Base):
         return date_list
 
     def extraction_date(self, hold_list):
-        '''指定した期間内にのリンクの日付のみ駆り出して返す
+        '''
+        指定した期間内にのリンクの日付のみ切り出して返す
 
         Args:
             list[開催日(yyyyMMdd), 開催日(yyyyMMdd) : 開催日のリスト

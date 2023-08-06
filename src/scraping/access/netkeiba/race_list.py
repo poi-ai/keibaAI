@@ -15,6 +15,7 @@ class RaceList(Base):
             association(str): 対象の開催協会(JRA or NAR)
 
         '''
+        super().__init__()
         self.date = date
         self.association = association
 
@@ -28,24 +29,30 @@ class RaceList(Base):
 
         '''
         if self.association.upper() == 'JRA':
-            # 中央競馬のレースID一覧を取得
             try:
+                # 中央競馬のレースID一覧を取得
+                self.logger.info(f'中央競馬レースID一覧取得開始 対象日: {self.date}')
                 race_id_list = self.get_race_id_list()
+                self.logger.info(f'中央競馬レースID一覧取得終了 対象日: {self.date}')
             except Exception as e:
                 self.error_input('中央競馬レースID一覧取得処理でエラー', e, traceback.format_exc())
                 return None, False
         elif self.association.upper() == 'NAR':
-            # 地方競馬の開催ID一覧を取得
             try:
+                # 地方競馬の開催ID一覧を取得
+                self.logger.info(f'地方競馬開催ID一覧取得開始 対象日: {self.date}')
                 hold_id = self.get_nar_hold_id_list()
+                self.logger.info(f'地方競馬開催ID一覧取得終了 対象日: {self.date}')
             except Exception as e:
                 self.error_input('地方競馬開催ID一覧取得処理でエラー', e, traceback.format_exc())
                 return None, False
 
-            # 地方競馬のレースID一覧を取得
-            # 引数は開催IDリストの1番目だけでよい
             try:
+                # 地方競馬のレースID一覧を取得
+                # 引数は開催IDリストの1番目だけでよい
+                self.logger.info(f'地方競馬レースID一覧取得開始 対象日: {self.date}')
                 race_id_list = self.get_race_id_list(hold_id[0])
+                self.logger.info(f'地方競馬レースID一覧取得終了 対象日: {self.date}')
             except Exception as e:
                 self.error_input('地方競馬レースID一覧取得処理でエラー', e, traceback.format_exc())
                 return None, False
