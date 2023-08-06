@@ -10,7 +10,7 @@ class Horse(Base):
         self.horse_id = horse_id
 
     def main(self):
-        '''主処理 TODO 後で消す
+        '''主処理 TODO 後で移行する
 
         Returns:
             bool: 処理結果
@@ -83,7 +83,7 @@ class Horse(Base):
             soup(bs4.BeautifulSoup): 競走馬ページのHTML
 
         Returns:
-            horse_info(dict): 競走馬の情報を格納した辞書
+            horse_info(dict): 競走馬の情報
                 ・horse_name(馬名)
                 ・country(生産国)
 
@@ -115,14 +115,14 @@ class Horse(Base):
             soup(bs4.BeautifulSoup): 競走馬ページのHTML
 
         Returns:
-            horse_info(dict): 競走馬の情報を格納した辞書
+            horse_info(dict): 競走馬の情報
                 ・birthday(誕生日)
                 ・hair_color(毛色)
                 ・birth_place(生産地)
-                ・seri_year(セリが行われた年)
-                ・seri_price(セリで取引された金額)
-                ・seri_id(取引されたセリのJBISID)
-                ・seri_name(取引されたセリの名称)
+                ・select_sale_year(セレクトセールが行われた年)
+                ・select_sale_price(セレクトセールでの取引額)
+                ・select_sale_id(取引されたセレクトセールのJBISID)
+                ・select_sale_name(取引されたセレクトセール名)
                 ・owner_id(馬主のJBISID)
                 ・owner_name(馬主名)
                 ・trainer_id(調教師のJBISID)
@@ -136,10 +136,10 @@ class Horse(Base):
             'birthday': '',
             'hair_color': '',
             'birth_place': '',
-            'seri_year': '',
-            'seri_price': '',
-            'seri_id': '',
-            'seri_name': '',
+            'select_sale_year': '',
+            'select_sale_price': '',
+            'select_sale_id': '',
+            'select_sale_name': '',
             'owner_id': '',
             'owner_name': '',
             'trainer_id': '',
@@ -183,14 +183,14 @@ class Horse(Base):
                 horse_info['birth_place'] = next_param.replace('産', '')
 
             if profile == '市場取引' and index + 3 < len(profiles):
-                horse_info['seri_year'] = next_param.replace('年', '')
-                horse_info['seri_price'] = profiles[index + 2].replace('万円', '')
+                horse_info['select_sale_year'] = next_param.replace('年', '')
+                horse_info['select_sale_price'] = profiles[index + 2].replace('万円', '')
 
-                seri_match = re.search('/seri/.+/(.+)/">(.+)</a>', str(profile_table[0]))
-                if seri_match != None:
-                    horse_info['seri_id'], horse_info['seri_name'] = seri_match.groups()
+                select_sale_match = re.search('/seri/.+/(.+)/">(.+)</a>', str(profile_table[0]))
+                if select_sale_match != None:
+                    horse_info['select_sale_id'], horse_info['select_sale_name'] = select_sale_match.groups()
                 else:
-                    horse_info['seri_name'] = profiles[index + 3]
+                    horse_info['select_sale_name'] = profiles[index + 3]
 
         # リンク付きデータの取得
         # 馬主
@@ -219,11 +219,11 @@ class Horse(Base):
             soup(bs4.BeautifulSoup): 競走馬ページのHTML
 
         Returns:
-            blood_info(dict): 競走馬の血統情報を格納した辞書
-                ・f_id(父のJBIS競走馬ID)
-                ・f_name(父の名前)
-                ・m_id(母のJBIS競走馬ID)
-                ・m_name(母の名前)
+            blood_info(dict): 競走馬の血統情報
+                ・father_id(父のJBIS競走馬ID)
+                ・father_name(父の名前)
+                ・mother_id(母のJBIS競走馬ID)
+                ・mother_name(母の名前)
                 ・ff_id(父父のJBIS競走馬ID)
                 ・ff_name(父父の名前)
                 ・fm_id(父母のJBIS競走馬ID)
@@ -236,10 +236,10 @@ class Horse(Base):
 
         '''
         blood_info = {
-            'f_id': '',
-            'f_name': '',
-            'm_id': '',
-            'm_name': '',
+            'father_id': '',
+            'father_name': '',
+            'mother_id': '',
+            'mother_name': '',
             'ff_id': '',
             'ff_name': '',
             'fm_id': '',
@@ -263,8 +263,8 @@ class Horse(Base):
         blood = blood_table[0]
 
         # 両親
-        blood_info['f_id'], blood_info['f_name'] = self.blood_match(blood.find('th', class_ = 'male'))
-        blood_info['m_id'], blood_info['m_name'] = self.blood_match(blood.find('th', class_ = 'female'))
+        blood_info['father_id'], blood_info['father_name'] = self.blood_match(blood.find('th', class_ = 'male'))
+        blood_info['mother_id'], blood_info['mother_name'] = self.blood_match(blood.find('th', class_ = 'female'))
 
         # 祖父
         ground_father = blood.find_all('td', class_ = 'male')
