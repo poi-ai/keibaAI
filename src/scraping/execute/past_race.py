@@ -2,6 +2,7 @@ import config
 import jst
 import traceback
 from base import Base
+from package import Api
 #from jbis.calendar import Calendar
 
 class PastRace(Base):
@@ -12,6 +13,7 @@ class PastRace(Base):
 
     def main(self):
         '''主処理'''
+        self.api = Api()
 
         # 開催情報を取得
         self.get_hold()
@@ -26,6 +28,8 @@ class PastRace(Base):
 
         # インスタンス生成
         cal = Calendar(self.oldest_date, self.latest_date)
+        
+        print(cal)
 
         exit()
 

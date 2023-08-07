@@ -1,3 +1,5 @@
+from .odds import Odds
+
 class Jra():
     def __init__(self):
-        pass
+        self.odds = Odds()
