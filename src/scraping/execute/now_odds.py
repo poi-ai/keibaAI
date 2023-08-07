@@ -4,8 +4,8 @@ import line
 import time
 import traceback
 from base import Base
-from .keibago.odds import Odds as narodds
-from .jra.odds import Odds as jraodds
+#from .keibago.odds import Odds as narodds
+#from .jra.odds import Odds as jraodds
 
 class NowOdds(Base):
     '''中央・地方競馬オッズ取得

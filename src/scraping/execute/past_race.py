@@ -2,7 +2,7 @@ import config
 import jst
 import traceback
 from base import Base
-from jbis.calendar import Calendar
+#from jbis.calendar import Calendar
 
 class PastRace(Base):
     def __init__(self):
@@ -26,6 +26,8 @@ class PastRace(Base):
 
         # インスタンス生成
         cal = Calendar(self.oldest_date, self.latest_date)
+
+        exit()
 
         # ひと月ずつ開催情報を取得
         for month in jst.between_month(self.oldest_date, self.latest_date):

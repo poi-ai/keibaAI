@@ -1,14 +1,16 @@
 import os, sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from .scraping import Scraping
 
-import analysis
-import common
-import scraping
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'common'))
 
-class KeibaAi():
+from .scraping.access import Access
+from .scraping.db import Db
+from .scraping.entity import Entity
+from .scraping.execute import Execute
+
+class Api():
     def __init__(self):
-        '''
-        初期処理
-
-        '''
-        pass
+        self.access = Access()
+        self.db = Db()
+        self.entity = Entity()
+        self.execute = Execute()

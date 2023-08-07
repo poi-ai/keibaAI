@@ -1,9 +1,9 @@
 import config
 import json
-import log
+import logger
 import requests
 
-logger = log.Logger()
+log = logger.Logger()
 
 def send(message, separate_no = 1):
     ''' LINEにメッセージを送信する
@@ -15,7 +15,7 @@ def send(message, separate_no = 1):
     '''
     # 10000字以上送ったらもうそれ以上送らない
     if separate_no > 10:
-        logger.info('LINE Notifyでの送信メッセージが10000字を超えました')
+        log.info('LINE Notifyでの送信メッセージが10000字を超えました')
         return
 
     # 設定ファイルからトークン取得
@@ -44,17 +44,17 @@ def send(message, separate_no = 1):
     try:
         r = requests.post('https://notify-api.line.me/api/notify', headers = headers, data = data)
     except Exception as e:
-        logger.error('LINE Notify APIでのメッセージ送信に失敗しました')
-        logger.error(e)
+        log.error('LINE Notify APIでのメッセージ送信に失敗しました')
+        log.error(e)
         return
 
     if r.status_code != 200:
-        logger.error('LINE Notify APIでエラーが発生しました')
-        logger.error('ステータスコード：' + r.status_code)
+        log.error('LINE Notify APIでエラーが発生しました')
+        log.error('ステータスコード：' + r.status_code)
         try:
-            logger.error('エラー内容：' + json.dumps(json.loads(r.content), indent=2))
+            log.error('エラー内容：' + json.dumps(json.loads(r.content), indent=2))
         except Exception as e:
-            logger.error(e)
+            log.error(e)
         return False
 
     # 未送信文字が残っていれば送信

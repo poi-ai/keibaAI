@@ -1,6 +1,6 @@
 import inspect
 import line
-import log
+import logger as log
 from pathlib import Path
 
 class Base:
@@ -46,3 +46,6 @@ class Base:
         '''
         classname = inspect.currentframe().f_back.f_locals.get('__qualname__')
         self.logger.error(f'{classname}クラスの{column_name}でエラー {message}')
+
+b = Base()
+print(b)
