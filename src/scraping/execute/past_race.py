@@ -8,6 +8,8 @@ from package import Api
 class PastRace(Base):
     def __init__(self):
         super().__init__()
+
+    def set(self):
         self.oldest_date = config.OLDEST_DATE
         self.latest_date = config.LATEST_DATE
 
@@ -28,10 +30,6 @@ class PastRace(Base):
 
         # インスタンス生成
         cal = Calendar(self.oldest_date, self.latest_date)
-        
-        print(cal)
-
-        exit()
 
         # ひと月ずつ開催情報を取得
         for month in jst.between_month(self.oldest_date, self.latest_date):

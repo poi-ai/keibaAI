@@ -15,6 +15,7 @@ def main():
 
     # 共通用ディレクトリと設定用ディレクトリモジュールパスに追加
     # README.mdの「共通用ディレクトリをモジュールパスに追加する」を実行していた場合はなくてもよい
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
     sys.path.append(os.path.join(os.path.dirname(__file__), 'src', 'common'))
     sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
 

@@ -5,8 +5,10 @@ import traceback
 from base import Base
 
 class Horse(Base):
-    def __init__(self, horse_id):
+    def __init__(self):
         super().__init__()
+
+    def set(self, horse_id):
         self.horse_id = horse_id
 
     def main(self):
@@ -295,15 +297,16 @@ class Horse(Base):
         else:
             return ('', '')
 
-# キタサンブラック
-h = Horse('0001155349')
-# イクイノックス
-#h = Horse('0001309176')
-# オグリ
-#h = Horse('0000177650')
-# ウシュバ
-#h = Horse('0001232861')
-#h = Horse('')
-#h = Horse('')
-#h = Horse('')
-h.main()
+if __name__ == '__main__':
+    # キタサンブラック
+    h = Horse('0001155349')
+    # イクイノックス
+    #h = Horse('0001309176')
+    # オグリ
+    #h = Horse('0000177650')
+    # ウシュバ
+    #h = Horse('0001232861')
+    #h = Horse('')
+    #h = Horse('')
+    #h = Horse('')
+    h.main()
