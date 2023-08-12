@@ -7,8 +7,6 @@ from execbase import ExecBase
 class PastRace(ExecBase):
     def __init__(self):
         super().__init__()
-
-    def set(self):
         self.oldest_date = config.OLDEST_DATE
         self.latest_date = config.LATEST_DATE
 

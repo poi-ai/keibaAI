@@ -2,6 +2,9 @@ import log
 import os
 import sys
 import config
+from execute import Execute
+
+logger = log.Log()
 
 def main():
     '''主処理'''
@@ -18,6 +21,9 @@ def main():
     sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
     sys.path.append(os.path.join(os.path.dirname(__file__), 'src', 'common'))
     sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
+    
+    # 実行ファイルのパッケージ呼び出し(インスタンス生成)
+    exec = Execute()
 
     # コマンドライン引数がある場合そちらの設定値を優先する(cron用)
     try:
@@ -34,9 +40,7 @@ def main():
             if config.DATA_TIME == 'past':
                 pass
             elif config.DATA_TIME == 'now':
-                from src.scraping.nowodds import NowOdds
-                odds = NowOdds()
-                odds.main()
+                exec.now_odds.main()
             else:
                 validate_error('DATA_TIME')
         elif config.DATA_TYPE == 'race':
@@ -49,14 +53,7 @@ def main():
                 validate_error('DATA_TIME')
         elif config.DATA_TYPE == 'horse':
             # フォルダ読み込み
-            from src.scraping.access.jbis import horse
-            # インスタンス生成
-            h = horse.Horse(config.JBIS_HORSE_ID)
-            # 失敗したら終了
-            if not h:
-                return
-            # 主処理
-            h.main()
+            pass
         else:
             validate_error('DATA_TYPE')
     elif config.SCRIPT_TYPE == 'analysis':
@@ -118,5 +115,4 @@ def args_check():
     return
 
 if __name__ == '__main__':
-    logger = log.Logger()
     main()

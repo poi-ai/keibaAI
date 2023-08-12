@@ -13,8 +13,6 @@ class NowOdds(ExecBase):
     '''
     def __init__(self):
         super().__init__()
-
-    def set(self):
         # 取得対象設定
         if config.ASSOSIATION == '1':
             self.jra_flg = self.nar_flg = True

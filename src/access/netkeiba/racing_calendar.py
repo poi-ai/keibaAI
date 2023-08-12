@@ -8,7 +8,7 @@ from base import Base
 class RacingCalendar(Base):
     '''netkeibaの中央競馬レーシングカレンダーページから開催日の取得を行う'''
 
-    def __init__(self,):
+    def __init__(self, oldest_date, latest_date):
         '''
         Args:
             oldest_date(str) : 取得対象の最古の日付(yyyyMMdd) >= 19860101
@@ -16,8 +16,6 @@ class RacingCalendar(Base):
 
         '''
         super().__init__()
-
-    def set(self, oldest_date, latest_date):
         self.oldest_date = oldest_date
         self.latest_date = latest_date
 
