@@ -3,11 +3,15 @@ import jst
 import re
 from base import Base
 
-class Calendar(Base):
+class RacingCalendar(Base):
     '''JBISレーシングカレンダーページから開催情報の取得を行う'''
 
-    def __init__(self, oldest_date, latest_date, association = '1'):
+    def __init__(self):
+        super().__init__()
+
+    def set(self, oldest_date, latest_date, association = '1'):
         '''
+        パラメータの設定
 
         Args:
             oldest_date(str) : 取得対象の最古の日付
