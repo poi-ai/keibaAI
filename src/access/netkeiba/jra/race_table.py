@@ -8,10 +8,7 @@ from base import Base
 
 class RaceTable(Base):
     '''netkeibaから中央競馬の出走表を取得する'''
-    def __init__(self,):
-        super().__init__()
-
-    def set(self, race_id, race_date = ''):
+    def __init__(self, race_id, race_date = ''):
         self.race_id = race_id
         self.race_date = race_date
 

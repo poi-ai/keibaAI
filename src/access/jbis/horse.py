@@ -5,10 +5,8 @@ import traceback
 from base import Base
 
 class Horse(Base):
-    def __init__(self):
+    def __init__(self, horse_id):
         super().__init__()
-
-    def set(self, horse_id):
         self.horse_id = horse_id
 
     def main(self):

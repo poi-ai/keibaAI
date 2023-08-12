@@ -7,10 +7,8 @@ from base import Base
 
 class RaceTable(Base):
     '''JBISから馬柱を取得する'''
-    def __init__(self):
+    def __init__(self, race_date, course_id, race_no):
         super().__init__()
-
-    def set(self, race_date, course_id, race_no):
         self.race_date = race_date
         self.course_id = course_id
         self.race_no = race_no
