@@ -1,7 +1,7 @@
-from src import Api
+from execute import Execute
 
-api = Api()
+exec = Execute()
 
-api.access.jbis.horse.set('0001155349')
-soup, result = api.access.jbis.horse.get_soup()
-print(api.access.jbis.horse.get_horse_name(soup))
+#api.access.jbis.horse.set('0001155349')
+#soup, result = api.access.jbis.horse.get_soup()
+#print(api.access.jbis.horse.get_horse_name(soup))
