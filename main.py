@@ -21,7 +21,7 @@ def main():
     sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
     sys.path.append(os.path.join(os.path.dirname(__file__), 'src', 'common'))
     sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
-    
+
     # 実行ファイルのパッケージ呼び出し(インスタンス生成)
     exec = Execute()
 

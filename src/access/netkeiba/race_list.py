@@ -6,7 +6,7 @@ from base import Base
 class RaceList(Base):
     '''netkeibaのレースリストからレースIDを取得する'''
 
-    def __init__(self):
+    def __init__(self, date, association):
         '''
         取得対象となる条件を指定
 
@@ -16,8 +16,6 @@ class RaceList(Base):
 
         '''
         super().__init__()
-
-    def set(self, date, association):
         self.date = date
         self.association = association
 
