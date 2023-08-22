@@ -1,7 +1,7 @@
 import log
 
 # エラー回避用ログインスタンス作成
-logger = log.Logger()
+logger = log.Log()
 
 def netkeiba(str):
     '''netkeiba.comで使用されている競馬場コードを変換するメソッド

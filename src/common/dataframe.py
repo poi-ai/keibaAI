@@ -3,7 +3,7 @@ import pandas as pd
 import time
 import traceback
 
-logger = log.Logger()
+logger = log.Log()
 
 def get_table(URL, sleep_time = 0, retry_count = 0):
     '''テーブル取得のリトライ処理

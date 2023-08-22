@@ -29,6 +29,8 @@ class Odds(Base):
 
     def __init__(self):
         super().__init__('keibago.odds')
+
+    def main(self):
         self.logger.info('----------------------------')
         self.logger.info('地方競馬オッズ記録システム起動')
         line.send('地方競馬オッズ記録システム起動')
