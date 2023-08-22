@@ -4,24 +4,26 @@ import traceback
 from base import Base
 
 class RaceList(Base):
-    '''netkeibaのレースリストからレースIDを取得する'''
+    '''netkeibaからレースIDを取得する'''
 
     def __init__(self, date, association):
         '''
         取得対象となる条件を指定
 
         Args:
-            date(str): 対象年月日(yyyyMMdd) JRA >= 20070728, NAR >= 20150225
+            date(str): 対象年月日(yyyyMMdd)
+                JRA >= 20070728, NAR >= 20150225
             association(str): 対象の開催協会(JRA or NAR)
 
         '''
         super().__init__()
-        self.date = date
-        self.association = association
+        self.date = str(date)
+        self.association = association.upper()
 
     def get(self):
         '''
-        指定条件に合致するレースID一覧を取得する TODO 後で移植
+        指定条件に合致するレースID一覧を取得する
+        TODO 後でexecuteに移植
 
         Returns:
             race_id_list(list) or None: レースID一覧
@@ -35,7 +37,7 @@ class RaceList(Base):
                 race_id_list = self.get_race_id_list()
                 self.logger.info(f'中央競馬レースID一覧取得終了 対象日: {self.date}')
             except Exception as e:
-                self.error_input('中央競馬レースID一覧取得処理でエラー', e, traceback.format_exc())
+                self.error_output('中央競馬レースID一覧取得処理でエラー', e, traceback.format_exc())
                 return None, False
         elif self.association.upper() == 'NAR':
             try:
@@ -44,7 +46,7 @@ class RaceList(Base):
                 hold_id = self.get_nar_hold_id_list()
                 self.logger.info(f'地方競馬開催ID一覧取得終了 対象日: {self.date}')
             except Exception as e:
-                self.error_input('地方競馬開催ID一覧取得処理でエラー', e, traceback.format_exc())
+                self.error_output('地方競馬開催ID一覧取得処理でエラー', e, traceback.format_exc())
                 return None, False
 
             try:
@@ -54,10 +56,10 @@ class RaceList(Base):
                 race_id_list = self.get_race_id_list(hold_id[0])
                 self.logger.info(f'地方競馬レースID一覧取得終了 対象日: {self.date}')
             except Exception as e:
-                self.error_input('地方競馬レースID一覧取得処理でエラー', e, traceback.format_exc())
+                self.error_output('地方競馬レースID一覧取得処理でエラー', e, traceback.format_exc())
                 return None, False
         else:
-            self.error_input('指定した開催協会が存在しません')
+            self.error_output('指定した開催協会が存在しません')
             raise
 
         return race_id_list, True
@@ -92,7 +94,7 @@ class RaceList(Base):
             if 'result' in race_url:
                 race_id_list.append(race_url[28:40])
 
-        race_id_list
+        return race_id_list
 
     def get_nar_hold_id_list(self):
         '''

@@ -16,12 +16,13 @@ class RacingCalendar(Base):
 
         '''
         super().__init__()
-        self.oldest_date = oldest_date
-        self.latest_date = latest_date
+        self.oldest_date = str(oldest_date)
+        self.latest_date = str(latest_date)
 
     def get(self):
         '''
         netkeibaのレーシングカレンダーページから開催の取得を行う
+        TODO この関数をベースにexecuteに処理作成
 
         Return:
             date_list(list[開催日(yyyyMMdd),...]) or None: 指定期間内の開催日のリスト
@@ -41,7 +42,7 @@ class RacingCalendar(Base):
                 month_date_list = self.get_date(year, month)
                 self.logger.info(f'netkeibaレースカレンダーの開催日取得終了 {year}年{month}月')
             except Exception as e:
-                self.error_input(f'netkeibaレースカレンダーの開催日取得に失敗しました {year}年{month}月', e, traceback.format_exc())
+                self.error_output(f'netkeibaレースカレンダーの開催日取得に失敗しました {year}年{month}月', e, traceback.format_exc())
                 return None, False
 
             # 月の開催日から指定期間に含まれない開催日を除去
@@ -51,7 +52,7 @@ class RacingCalendar(Base):
 
         return list(itertools.chain.from_iterable(date_list)), True
 
-    def get_date(self, soup, year, month):
+    def get_date(self, year, month):
         '''
         レーシングカレンダーのリンクから開催日を取得する
 
@@ -89,7 +90,7 @@ class RacingCalendar(Base):
 
     def extraction_date(self, hold_list):
         '''
-        指定した期間内にのリンクの日付のみ切り出して返す
+        指定した期間内のリンクの日付のみ切り出して返す
 
         Args:
             list[開催日(yyyyMMdd), 開催日(yyyyMMdd) : 開催日のリスト
