@@ -35,6 +35,8 @@ class Odds(Base):
 
     def __init__(self):
         super().__init__('jra.odds')
+
+    def main(self):
         self.logger.info('----------------------------')
         self.logger.info('中央競馬オッズ記録システム起動')
         line.send('中央競馬オッズ記録システム起動')

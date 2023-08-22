@@ -3,11 +3,9 @@ import jst
 import line
 import time
 import traceback
-from base import Base
-from .keibago.odds import Odds as narodds
-from .jra.odds import Odds as jraodds
+from execbase import ExecBase
 
-class NowOdds(Base):
+class NowOdds(ExecBase):
     '''中央・地方競馬オッズ取得
     Instance Parameter:
        jra_flg(bool) : 中央競馬処理稼働フラグ
@@ -68,23 +66,23 @@ class NowOdds(Base):
 
         # 中央競馬用インスタンス作成
         try:
-            jra = jraodds()
+            jra_odds = self.access.jra.odds
         except Exception as e:
             self.error_output('中央_初期処理でエラー', e, traceback.format_exc(), False)
             self.jra_flg = False
 
-        if not jra.kaisai:
+        if not jra_odds.kaisai:
             self.logger.info('中央_本日の開催はありません')
             self.jra_flg = False
 
         # 地方競馬用インスタンス作成
         try:
-            nar = narodds()
+            nar_odds = self.access.keibago.odds
         except Exception as e:
             self.error_output('地方_初期処理でエラー', e, traceback.format_exc(), False)
             self.nar_flg = False
 
-        return jra, nar
+        return jra_odds, nar_odds
 
     def continue_check(self):
         '''処理を続けるか(=全レース記録済みでないか)のチェックを行う'''
