@@ -4,7 +4,7 @@ import os
 import sys
 import re
 
-class Logger():
+class Log():
     '''loggerの設定を簡略化
         ログファイル名は呼び出し元のファイル名
         出力はINFO以上のメッセージのみ
