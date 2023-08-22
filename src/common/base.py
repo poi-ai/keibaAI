@@ -8,9 +8,9 @@ class Base:
 
     def __init__(self, logger_filename = None):
         if logger_filename != None:
-            self.logger = log.Logger(logger_filename)
+            self.logger = log.Log(logger_filename)
         else:
-            self.logger = log.Logger(Path(inspect.stack()[1].filename).stem)
+            self.logger = log.Log(Path(inspect.stack()[1].filename).stem)
 
     def error_output(self, message, e = None, stacktrace = None, line_flg = True):
         '''

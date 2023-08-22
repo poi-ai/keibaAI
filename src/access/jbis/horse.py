@@ -295,15 +295,16 @@ class Horse(Base):
         else:
             return ('', '')
 
-# キタサンブラック
-h = Horse('0001155349')
-# イクイノックス
-#h = Horse('0001309176')
-# オグリ
-#h = Horse('0000177650')
-# ウシュバ
-#h = Horse('0001232861')
-#h = Horse('')
-#h = Horse('')
-#h = Horse('')
-h.main()
+if __name__ == '__main__':
+    # キタサンブラック
+    h = Horse('0001155349')
+    # イクイノックス
+    #h = Horse('0001309176')
+    # オグリ
+    #h = Horse('0000177650')
+    # ウシュバ
+    #h = Horse('0001232861')
+    #h = Horse('')
+    #h = Horse('')
+    #h = Horse('')
+    h.main()

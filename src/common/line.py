@@ -3,7 +3,7 @@ import json
 import log
 import requests
 
-logger = log.Logger()
+logger = log.Log()
 
 def send(message, separate_no = 1):
     ''' LINEにメッセージを送信する
