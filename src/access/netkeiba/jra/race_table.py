@@ -9,6 +9,7 @@ from base import Base
 class RaceTable(Base):
     '''netkeibaから中央競馬の出走表を取得する'''
     def __init__(self, race_id, race_date = ''):
+        super().__init__()
         self.race_id = race_id
         self.race_date = race_date
 
@@ -27,23 +28,23 @@ class RaceTable(Base):
             soup = self.get_soup()
             self.logger.info(f'netkeibaから出走表ページのHTML取得処理終了 レースID: {self.race_id}')
         except Exception as e:
-            self.error_input('netkeiba出走表ページ取得処理でエラー', e, traceback.format_exc())
+            self.error_output('netkeiba出走表ページ取得処理でエラー', e, traceback.format_exc())
             return None, None, False
 
         try:
             self.logger.info(f'netkeiba出走表からのレース情報取得処理開始 レースID: {self.race_id}')
-            race_info = self.get_race_info(soup)
+            race_info, result = self.get_race_info(soup)
             self.logger.info(f'netkeiba出走表からのレース情報取得処理終了 レースID: {self.race_id}')
         except Exception as e:
-            self.error_input('netkeiba出走表からのレース情報取得処理でエラー', e, traceback.format_exc())
+            self.error_output('netkeiba出走表からのレース情報取得処理でエラー', e, traceback.format_exc())
             return None, None, False
 
         try:
             self.logger.info(f'netkeibaの出走表からの出走馬情報取得処理開始 レースID: {self.race_id}')
-            horse_info = self.get_horse_info(soup)
+            horse_info, result = self.get_horse_info(soup)
             self.logger.info(f'netkeibaの出走表からの出走馬情報取得処理終了 レースID: {self.race_id}')
         except Exception as e:
-            self.error_input('netkeibaの出走表からの出走馬情報取得処理でエラー', e, traceback.format_exc())
+            self.error_output('netkeibaの出走表からの出走馬情報取得処理でエラー', e, traceback.format_exc())
             return None, None, False
 
 
@@ -68,6 +69,8 @@ class RaceTable(Base):
 
         '''
         race_info = {}
+
+        race_info['netkeiba_race_id'] = self.race_id
 
         # 日付が設定されていない場合はサイト内から取得
         if self.race_date == '':
@@ -253,8 +256,10 @@ class RaceTable(Base):
         race_info['fourth_prize'] = float(prize.groups()[3]) * 10
         race_info['fifth_prize'] = float(prize.groups()[4]) * 10
 
+        return race_info, True
 
-    def horse_info(self, soup):
+
+    def get_horse_info(self, soup):
         '''
         netkeibaの出走表から出走馬の情報を取得する
 
@@ -313,14 +318,14 @@ class RaceTable(Base):
                 horse_info['horse_name'] = horse_name
 
             # 父名・母名・母父名
-            horse_info['father'] = info.find('div', class_ = 'Horse01').text
-            horse_info['mother'] = info.find('div', class_ = 'Horse03').text
-            horse_info['grandfather'] = info.find('div', class_ = 'Horse04').text.replace('(', '').replace(')', '')
+            horse_info['father_name'] = info.find('div', class_ = 'Horse01').text
+            horse_info['mother_name'] = info.find('div', class_ = 'Horse03').text
+            horse_info['grandfather_name'] = info.find('div', class_ = 'Horse04').text.replace('(', '').replace(')', '')
 
             # 調教師・調教師所属
             trainer = info.find('div', class_ = 'Horse05').text.split('・')
             horse_info['trainer_belong'] = trainer[0]
-            horse_info['trainer'] = mold.rm(trainer[1])
+            horse_info['trainer_name'] = mold.rm(trainer[1])
 
             # netkeiba独自の調教師ID
             trainer_id = re.search('db.netkeiba.com/trainer/result/recent/(\d+)', str(info))
@@ -418,3 +423,11 @@ class RaceTable(Base):
             horse_info_list[i] = horse_info
 
         return horse_info_list, True
+
+r = RaceTable(202304020301)
+race_info, horse_info, result = r.get()
+print(mold.tidy_dict(race_info))
+print(type(horse_info))
+for i in horse_info:
+    print(mold.tidy_dict(i))
+print(result)

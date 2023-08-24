@@ -128,3 +128,6 @@ class RaceList(Base):
                 kaisai_id_list.append(hold_url[11:21])
 
         return kaisai_id_list
+
+r = RaceList(20230805, 'JRA')
+print(r.get())
