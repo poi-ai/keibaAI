@@ -7,11 +7,17 @@ import traceback
 from base import Base
 
 class RaceTable(Base):
-    '''netkeibaから中央競馬の出走表を取得する'''
-    def __init__(self, race_id, race_date = ''):
+    '''netkeibaから中央競馬の出走表のデータを取得する'''
+
+    def __init__(self):
         super().__init__()
+
+    def set(self, race_id):
+        '''
+        Args:
+            race_id(str): 
+        '''
         self.race_id = race_id
-        self.race_date = race_date
 
     def get(self):
         '''
@@ -72,12 +78,11 @@ class RaceTable(Base):
 
         race_info['netkeiba_race_id'] = self.race_id
 
-        # 日付が設定されていない場合はサイト内から取得
-        if self.race_date == '':
-            date_link = soup.find('dd', class_ = 'Active')
-            m = re.search('kaisai_date=(\d+)', str(date_link))
-            if m != None:
-                self.race_date = race_info['race_date'] = m.groups()[0]
+        # 出走日を抽出
+        date_link = soup.find('dd', class_ = 'Active')
+        m = re.search('kaisai_date=(\d+)', str(date_link))
+        if m != None:
+            self.race_date = race_info['race_date'] = m.groups()[0]
 
         # コース情報や状態を抽出
         race_data_01 = soup.find('div', class_ = 'RaceData01')
@@ -423,11 +428,3 @@ class RaceTable(Base):
             horse_info_list[i] = horse_info
 
         return horse_info_list, True
-
-r = RaceTable(202304020301)
-race_info, horse_info, result = r.get()
-print(mold.tidy_dict(race_info))
-print(type(horse_info))
-for i in horse_info:
-    print(mold.tidy_dict(i))
-print(result)

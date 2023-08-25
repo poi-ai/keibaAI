@@ -6,7 +6,10 @@ from base import Base
 class RaceList(Base):
     '''netkeibaからレースIDを取得する'''
 
-    def __init__(self, date, association):
+    def __init__(self):
+        super().__init__()
+
+    def set(self, date, association):
         '''
         取得対象となる条件を指定
 
@@ -16,7 +19,6 @@ class RaceList(Base):
             association(str): 対象の開催協会(JRA or NAR)
 
         '''
-        super().__init__()
         self.date = str(date)
         self.association = association.upper()
 
@@ -128,6 +130,3 @@ class RaceList(Base):
                 kaisai_id_list.append(hold_url[11:21])
 
         return kaisai_id_list
-
-r = RaceList(20230805, 'JRA')
-print(r.get())
