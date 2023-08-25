@@ -11,69 +11,27 @@ class RaceTable(Base):
 
     def __init__(self):
         super().__init__()
+        self.race_id = ''
+        self.soup = ''
 
-    def set(self, race_id):
-        '''
-        Args:
-            race_id(str): 
-        '''
-        self.race_id = race_id
-
-    def get(self):
-        '''
-        netkeibaから指定したレースIDの出走表を取得する
-
-        Returns:
-            race_info(dict) or None: レース情報
-            horse_info(list[dict, dict]) or None: 出走馬情報
-            bool: 実行結果
-
-        '''
-        try:
-            self.logger.info(f'netkeibaから出走表ページのHTML取得処理開始 レースID: {self.race_id}')
-            soup = self.get_soup()
-            self.logger.info(f'netkeibaから出走表ページのHTML取得処理終了 レースID: {self.race_id}')
-        except Exception as e:
-            self.error_output('netkeiba出走表ページ取得処理でエラー', e, traceback.format_exc())
-            return None, None, False
-
-        try:
-            self.logger.info(f'netkeiba出走表からのレース情報取得処理開始 レースID: {self.race_id}')
-            race_info, result = self.get_race_info(soup)
-            self.logger.info(f'netkeiba出走表からのレース情報取得処理終了 レースID: {self.race_id}')
-        except Exception as e:
-            self.error_output('netkeiba出走表からのレース情報取得処理でエラー', e, traceback.format_exc())
-            return None, None, False
-
-        try:
-            self.logger.info(f'netkeibaの出走表からの出走馬情報取得処理開始 レースID: {self.race_id}')
-            horse_info, result = self.get_horse_info(soup)
-            self.logger.info(f'netkeibaの出走表からの出走馬情報取得処理終了 レースID: {self.race_id}')
-        except Exception as e:
-            self.error_output('netkeibaの出走表からの出走馬情報取得処理でエラー', e, traceback.format_exc())
-            return None, None, False
-
-
-        return race_info, horse_info, True
-
-    def get_soup(self):
-        '''出走表ページからHTMLを取得する'''
-        url = f'https://race.netkeiba.com/race/shutuba_past.html?race_id={self.race_id}'
-        return gethtml.soup(url)
-
-    def get_race_info(self, soup):
+    def get_race_info(self, race_id):
         '''
         netkeibaの出走表からレース情報を取得する
 
         Args:
-            soup(bs4.BeautifulSoup): 出走表ページのHTML
+            race_id(str): 取得対象のレースID
 
         Returns:
-            race_info(dict) or None: レース情報
+            race_info(dict or bool): レース情報、データ欠損の場合はFalse
                 TODO パラメータ書く
-            bool: 実行結果
 
         '''
+        # HTMLを取得、既に取得済みのHTMLが変数に残っているならスキップ
+        if self.race_id != race_id or self.soup == '':
+            url = f'https://race.netkeiba.com/race/shutuba_past.html?race_id={race_id}'
+            self.soup = soup = gethtml.soup(url)
+            self.race_id = race_id
+
         race_info = {}
 
         race_info['netkeiba_race_id'] = self.race_id
@@ -88,12 +46,12 @@ class RaceTable(Base):
         race_data_01 = soup.find('div', class_ = 'RaceData01')
         race_data_list = mold.rm(race_data_01.text).split('/')
 
-        # 当日公表データが少ない(=レース中止)の場合弾く
+        # 当日公表のデータが少ない場合はレース中止とみなし弾く
         if len(race_data_list) < 4:
             self.logger.info(f'{babaid.netkeiba(self.baba_id)}{self.race_no}R(race_id:{self.race_id})のレースデータが不足しているため記録を行いません')
             #self.logger.info(f'取得先URL:{url}')
             self.race_flg = False
-            return None, False
+            return False
 
         # 発走時刻取得
         race_info['race_time'] = race_data_list[0].replace('発走', '')
@@ -261,22 +219,26 @@ class RaceTable(Base):
         race_info['fourth_prize'] = float(prize.groups()[3]) * 10
         race_info['fifth_prize'] = float(prize.groups()[4]) * 10
 
-        return race_info, True
+        return race_info
 
-
-    def get_horse_info(self, soup):
+    def get_horse_info(self, race_id):
         '''
         netkeibaの出走表から出走馬の情報を取得する
 
         Args:
-            soup(bs4.BeautifulSoup): レース出走表ページのHTML
+            race_id(str): 取得対象のレースID
 
         Returns:
-            horse_info_list(list[dict{], dict{}...]) or None: 各出走馬の情報
+            horse_info_list(list[dict{], dict{}...] or bool): 各出走馬の情報、データ欠損の場合はFalse
                 TODO 各パラメータ書く
-            bool: 実行結果
 
         '''
+        # HTMLを取得、既に取得済みのHTMLが変数に残っているならスキップ
+        if self.race_id != race_id or self.soup == '':
+            url = f'https://race.netkeiba.com/race/shutuba_past.html?race_id={race_id}'
+            self.soup = soup = gethtml.soup(url)
+            self.race_id = race_id
+
         horse_info_list = []
 
         # 各馬の情報取得
@@ -311,7 +273,7 @@ class RaceTable(Base):
             else:
                 self.logger.info(f'{babaid.netkeiba(self.baba_id)}{self.race_no}R(race_id:{self.race_id})の競走馬データが見つかりません')
                 self.race_flg = False
-                return
+                return False
 
             # 馬名
             horse_name = mold.rm(horse_type.text)
@@ -427,4 +389,4 @@ class RaceTable(Base):
 
             horse_info_list[i] = horse_info
 
-        return horse_info_list, True
+        return horse_info_list

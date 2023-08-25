@@ -58,18 +58,18 @@ def between_month(date1, date2):
     2つの日付間の年月を取得する
 
     Args:
-        date1(str) : 日付1
-        date2(str) : 日付2
+        date1(int or str) : 日付1
+        date2(int or str) : 日付2
             引数のどちらが新しい/古い日付かは気にしなくてよい
 
     Return:
-        month_list[(str), (str)...] : str型の年月を古い順で並べたリスト
+        month_list[(str), (str)...] : 年月を古い順で並べたリスト
             引数の年月は含む
 
     '''
 
     # 2つの日付間の年月日を取得する
-    date_list = between_date(date1, date2)
+    date_list = between_date(str(date1), str(date2))
 
     # 年月だけ切り出し、重複しないようにリストへ追加する
     month_list = []
@@ -84,8 +84,8 @@ def between_date(date1, date2):
     2つの日付間の年月日を取得する
 
     Args:
-        date1(str) : 日付1
-        date2(str) : 日付2
+        date1(int or str) : 日付1
+        date2(int or str) : 日付2
             引数のどちらが新しい/古い日付かは気にしなくてよい
 
     Return:
@@ -94,8 +94,8 @@ def between_date(date1, date2):
 
     '''
     # datetime型に変換
-    start = datetime.strptime(min(date1, date2), '%Y%m%d')
-    end = datetime.strptime(max(date1, date2), '%Y%m%d')
+    start = datetime.strptime(min(str(date1), str(date2)), '%Y%m%d')
+    end = datetime.strptime(max(str(date1), str(date2)), '%Y%m%d')
 
     # 2つの日付間の全日付を取得
     date_range = [start + timedelta(days = x) for x in range(0, (end - start).days + 1)]
