@@ -6,17 +6,20 @@ from base import Base
 class RacingCalendar(Base):
     '''JBISレーシングカレンダーページから開催情報の取得を行う'''
 
-    def __init__(self, oldest_date, latest_date, association = '1'):
+    def __init__(self):
+        super().__init__()
+
+    def set(self, oldest_date, latest_date, association = '1'):
         '''
         パラメータの設定
 
         Args:
             oldest_date(str) : 取得対象の最古の日付
             latest_date(str) : 取得対象の最新の日付
-            association(str) : 取得対象は中央か地方か両方か、1:両方 2:中央のみ 3:地方のみ
+            association(str) : 取得対象は中央か地方か両方か、
+                -1:中央のみ、0: 両方、1:地方のみ
 
         '''
-        super().__init__()
         self.oldest_date = oldest_date
         self.latest_date = latest_date
         self.association = association
@@ -42,11 +45,11 @@ class RacingCalendar(Base):
             extraction_hold_list = self.extraction_hold(hold_list)
 
             # 中央のみor地方のみor両方を切り出して返す
-            if self.association == '1':
+            if self.association == '0':
                 hold_list += extraction_hold_list
-            elif self.association == '2':
+            elif self.association == '-1':
                 hold_list += self.jra(extraction_hold_list)
-            elif self.association == '3':
+            elif self.association == '1':
                 hold_list += self.nar(extraction_hold_list)
 
         return hold_list

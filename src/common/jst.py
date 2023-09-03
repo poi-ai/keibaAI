@@ -54,33 +54,54 @@ def time_min(time1, time2):
     return datetime.strptime(min(time1.strftime("%Y%m%d%H%M%S"), time2.strftime("%Y%m%d%H%M%S")), "%Y%m%d%H%M%S")
 
 def between_month(date1, date2):
-    '''2つの日付間の年月を取得する
+    '''
+    2つの日付間の年月を取得する
 
     Args:
-        date1(str) : 日付1
-        date2(str) : 日付2
-                     引数のどちらが新しい/古いかは気にしなくてよい
+        date1(int or str) : 日付1
+        date2(int or str) : 日付2
+            引数のどちらが新しい/古い日付かは気にしなくてよい
 
     Return:
-        month_list[(str), (str)...] : str型の年月を古い順で並べたリスト
-                                      引数の年月は含む
+        month_list[(str), (str)...] : 年月を古い順で並べたリスト
+            引数の年月は含む
 
     '''
 
-    # datetime型に変換
-    start = datetime.strptime(min(date1, date2), '%Y%m%d')
-    end = datetime.strptime(max(date1, date2), '%Y%m%d')
+    # 2つの日付間の年月日を取得する
+    date_list = between_date(str(date1), str(date2))
 
-    # 2日付間の全日付を取得
-    date_range = [start + timedelta(days = x) for x in range(0, (end - start).days + 1)]
-
-    # 年月だけ文字列型に変換し、重複を削除する
+    # 年月だけ切り出し、重複しないようにリストへ追加する
     month_list = []
-    for date in date_range:
-        if date.strftime('%Y%m') not in month_list:
-            month_list.append(date.strftime('%Y%m'))
+    for date in date_list:
+        if date[:6] not in month_list:
+            month_list.append(date[:6])
 
     return month_list
+
+def between_date(date1, date2):
+    '''
+    2つの日付間の年月日を取得する
+
+    Args:
+        date1(int or str) : 日付1
+        date2(int or str) : 日付2
+            引数のどちらが新しい/古い日付かは気にしなくてよい
+
+    Return:
+        date_list(list[(str), (str)...]) : 年月日を古い順に並べたリスト
+            引数の年月は含む
+
+    '''
+    # datetime型に変換
+    start = datetime.strptime(min(str(date1), str(date2)), '%Y%m%d')
+    end = datetime.strptime(max(str(date1), str(date2)), '%Y%m%d')
+
+    # 2つの日付間の全日付を取得
+    date_range = [start + timedelta(days = x) for x in range(0, (end - start).days + 1)]
+
+    # 文字列型に変換し返す
+    return [date.strftime('%Y%m%d') for date in date_range]
 
 def yesterday(date = date()):
     '''指定した一日前の日付をstr型(yyyyMMDD)で返す'''
@@ -94,5 +115,3 @@ def clock(date = now()):
 def change_format(value, before_format, after_format):
     '''時間を表すstr型のフォーマットを変更して返す'''
     return datetime.strftime(datetime.strptime(value, before_format), after_format)
-
-

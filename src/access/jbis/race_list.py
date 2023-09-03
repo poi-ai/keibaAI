@@ -6,8 +6,15 @@ from base import Base
 class RaceList(Base):
     '''JBISのレース一覧ページからレース情報とレースへのリンクを取得する'''
 
-    def __init__(self, race_date, course_id):
+    def __init__(self):
         super().__init__()
+
+    def set(self, race_date, course_id):
+        '''
+        Args(任意):
+            race_date(str): 取得する対象の日付(yyyyMMddフォーマット)
+            course_id(str): 取得する対象のJBIS競馬場ID
+        '''
         self.race_date = race_date
         self.course_id = course_id
 

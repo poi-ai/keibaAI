@@ -1,0 +1,2 @@
+class RaceTable():
+    pass
