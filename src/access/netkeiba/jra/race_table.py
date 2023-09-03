@@ -31,6 +31,8 @@ class RaceTable(Base):
             url = f'https://race.netkeiba.com/race/shutuba_past.html?race_id={race_id}'
             self.soup = soup = gethtml.soup(url)
             self.race_id = race_id
+        else:
+            soup = self.soup
 
         race_info = {}
 
@@ -238,6 +240,8 @@ class RaceTable(Base):
             url = f'https://race.netkeiba.com/race/shutuba_past.html?race_id={race_id}'
             self.soup = soup = gethtml.soup(url)
             self.race_id = race_id
+        else:
+            soup = self.soup
 
         horse_info_list = []
 

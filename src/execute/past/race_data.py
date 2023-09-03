@@ -1,5 +1,7 @@
 import itertools
 import jst
+import output
+import os
 import traceback
 from execbase import ExecBase
 
@@ -63,12 +65,12 @@ class RaceData(ExecBase):
             nar_date_list = jst.between_date(self.oldest_date, self.latest_date)
 
         # 取得する開催日が存在していていたら取得用のインスタンスを準備
-        if len(jra_race_list) != 0:
+        if len(jra_date_list) != 0:
             jra_race_list = self.access.netkeiba.jra.race_list
             jra_race_table = self.access.netkeiba.jra.race_table
             #jra_race_result = self.access.netkeiba.jra.race_result
 
-        if len(nar_race_list) != 0:
+        if len(nar_date_list) != 0:
             nar_race_list = self.access.netkeiba.nar.race_list
             nar_race_table = self.access.netkeiba.nar.race_table
             #nar_race_result = self.access.netkeiba.jra.race_result
@@ -99,11 +101,12 @@ class RaceData(ExecBase):
                             # TODO 飛ばす処理
 
                         # TODO CSVに保存
-                        pass
+                        output.dict_to_csv(race_info, self.csv_filepath('race_info'))
 
                         # TODO DBに保存
                         pass
 
+                        # レース結果から結果情報を取得
                         try:
                             self.logger.info(f'netkeibaの出走表からの出走馬情報取得処理開始 レースID: {race_id}')
                             horse_info = jra_race_table.get_horse_info(race_id)
@@ -111,9 +114,10 @@ class RaceData(ExecBase):
                         except Exception as e:
                             self.error_output('netkeibaの出走表からの出走馬情報取得処理でエラー', e, traceback.format_exc())
                             # TODO 飛ばす処理
-
+                            
                         # TODO CSVに保存
-                        pass
+                        for info in horse_info:
+                            output.dict_to_csv(info, self.csv_filepath('horse_info'))
 
                         # TODO DBに保存
                         pass

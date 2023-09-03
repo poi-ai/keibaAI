@@ -1,6 +1,7 @@
 import inspect
 import line
 import log
+import os
 from pathlib import Path
 
 class Base:
@@ -46,3 +47,19 @@ class Base:
         '''
         classname = inspect.currentframe().f_back.f_locals.get('__qualname__')
         self.logger.error(f'{classname}クラスの{column_name}でエラー {message}')
+
+    def csv_filepath(self, filename):
+        '''
+        CSVファイル名からパスを生成する
+
+        Args:
+            filename(str): CSVファイル名
+
+        Returns:
+            filepath(str): CSVファイルパス
+
+        '''
+        if '.csv' in filename:
+            return os.path.join(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'csv', filename))
+        else:
+            return os.path.join(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'csv', f'{filename}.csv'))
