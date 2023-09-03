@@ -5,9 +5,15 @@ import traceback
 from base import Base
 
 class Horse(Base):
-    def __init__(self, horse_id):
+    def __init__(self):
         super().__init__()
-        self.horse_id = horse_id
+
+    def set(self, horse_id):
+        '''
+        Args:
+            horse_id(str): 取得対象の競走馬ID
+        '''
+        self.horse_id = str(horse_id)
 
     def main(self):
         '''主処理 TODO 後で移行する

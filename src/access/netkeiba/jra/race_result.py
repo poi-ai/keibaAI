@@ -1,0 +1,2 @@
+class RaceResult():
+    pass
