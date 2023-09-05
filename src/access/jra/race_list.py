@@ -3,7 +3,7 @@ import jst
 import re
 from base import Base
 from datetime import datetime
-from .do_action import DoAction
+from do_action import DoAction
 from bs4 import BeautifulSoup
 
 class RaceList(Base, DoAction):
@@ -114,7 +114,7 @@ class RaceList(Base, DoAction):
         soup = self.do_action(self.ODDS_BASE_URL, cname)
 
         # TODO ↓ここやり直し
-        # キーを持っていないので、抜けがある券種(少頭数レースの枠連とか)が出るとずれる
+        # キーを持っていないので、抜けがある券種(少頭数レースの枠連とか)があるとずれる
         # レース単位でチェックする処理に変える
 
         # 各券種別のオッズページのパラメータを取得
@@ -129,3 +129,8 @@ class RaceList(Base, DoAction):
         }
 
         return odds_param_dict
+
+# TODO サンプルコード 後で消す
+import mold
+rl = RaceList()
+print(mold.tidy_dict(rl.get_odds_page_cname(rl.get_race_list_page_cname('2'))))

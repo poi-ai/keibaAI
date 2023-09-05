@@ -1,5 +1,5 @@
 from base import Base
-from .do_action import DoAction
+from do_action import DoAction
 
 class Odds(Base, DoAction):
     def __init__(self):
@@ -7,10 +7,10 @@ class Odds(Base, DoAction):
 
     def get_tanpuku(self, cname):
         '''
-        Ã±¾¡¡¦Ê£¾¡¥ª¥Ã¥º¤ò¼èÆÀ¤¹¤ë
+        å˜å‹ãƒ»è¤‡å‹ã‚ªãƒƒã‚ºã‚’å–å¾—ã™ã‚‹
 
         Args:
-            cname(str): ¥ª¥Ã¥º¥Ú¡¼¥¸¤ÎCNAME
+            cname(str): ã‚ªãƒƒã‚ºãƒšãƒ¼ã‚¸ã®CNAME
 
         Returns:
 
@@ -19,10 +19,10 @@ class Odds(Base, DoAction):
 
     def get_wakuren(self, cname):
         '''
-        ÏÈÏ¢¤Î¥ª¥Ã¥º¤ò¼èÆÀ¤¹¤ë
+        æ é€£ã®ã‚ªãƒƒã‚ºã‚’å–å¾—ã™ã‚‹
 
         Args:
-            cname(str): ¥ª¥Ã¥º¥Ú¡¼¥¸¤ÎCNAME
+            cname(str): ã‚ªãƒƒã‚ºãƒšãƒ¼ã‚¸ã®CNAME
 
         Returns:
 
@@ -31,10 +31,10 @@ class Odds(Base, DoAction):
 
     def get_umaren(self, cname):
         '''
-        ÇÏÏ¢¤Î¥ª¥Ã¥º¤ò¼èÆÀ¤¹¤ë
+        é¦¬é€£ã®ã‚ªãƒƒã‚ºã‚’å–å¾—ã™ã‚‹
 
         Args:
-            cname(str): ¥ª¥Ã¥º¥Ú¡¼¥¸¤ÎCNAME
+            cname(str): ã‚ªãƒƒã‚ºãƒšãƒ¼ã‚¸ã®CNAME
 
         Returns:
 
@@ -43,10 +43,10 @@ class Odds(Base, DoAction):
 
     def get_wide(self, cname):
         '''
-        ¥ï¥¤¥É¤Î¥ª¥Ã¥º¤ò¼èÆÀ¤¹¤ë
+        ãƒ¯ã‚¤ãƒ‰ã®ã‚ªãƒƒã‚ºã‚’å–å¾—ã™ã‚‹
 
         Args:
-            cname(str): ¥ª¥Ã¥º¥Ú¡¼¥¸¤ÎCNAME
+            cname(str): ã‚ªãƒƒã‚ºãƒšãƒ¼ã‚¸ã®CNAME
 
         Returns:
 
@@ -55,10 +55,10 @@ class Odds(Base, DoAction):
 
     def get_umatan(self, cname):
         '''
-        ÇÏÃ±¤Î¥ª¥Ã¥º¤ò¼èÆÀ¤¹¤ë
+        é¦¬å˜ã®ã‚ªãƒƒã‚ºã‚’å–å¾—ã™ã‚‹
 
         Args:
-            cname(str): ¥ª¥Ã¥º¥Ú¡¼¥¸¤ÎCNAME
+            cname(str): ã‚ªãƒƒã‚ºãƒšãƒ¼ã‚¸ã®CNAME
 
         Returns:
 
@@ -67,10 +67,10 @@ class Odds(Base, DoAction):
 
     def get_trio(self, cname):
         '''
-        »°Ï¢Ê£¤Î¥ª¥Ã¥º¤ò¼èÆÀ¤¹¤ë
+        ä¸‰é€£è¤‡ã®ã‚ªãƒƒã‚ºã‚’å–å¾—ã™ã‚‹
 
         Args:
-            cname(str): ¥ª¥Ã¥º¥Ú¡¼¥¸¤ÎCNAME
+            cname(str): ã‚ªãƒƒã‚ºãƒšãƒ¼ã‚¸ã®CNAME
 
         Returns:
 
@@ -79,15 +79,30 @@ class Odds(Base, DoAction):
 
     def get_tirece(self, cname):
         '''
-        »°Ï¢Ã±¤Î¥ª¥Ã¥º¤ò¼èÆÀ¤¹¤ë
+        ä¸‰é€£å˜ã®ã‚ªãƒƒã‚ºã‚’å–å¾—ã™ã‚‹
 
         Args:
-            cname(str): ¥ª¥Ã¥º¥Ú¡¼¥¸¤ÎCNAME
+            cname(str): ã‚ªãƒƒã‚ºãƒšãƒ¼ã‚¸ã®CNAME
 
         Returns:
 
         '''
         soup = self.do_action(self.ODDS_BASE_URL, cname)
 
+    def judge_page_type(self, cname):
+        '''
+        æŒ‡å®šã—ãŸCNAMEã®ãƒšãƒ¼ã‚¸ãŒã©ã®åˆ¸ç¨®ã®ãƒšãƒ¼ã‚¸ã‹åˆ¤æ–­ã™ã‚‹
+
+        Args:
+            cname(str): ã‚ªãƒƒã‚ºãƒšãƒ¼ã‚¸ã®CNAME
+
+        Returns:
+            page_type(str): ã©ã®ç¨®åˆ¥ã®ãƒšãƒ¼ã‚¸ã‹
+                tanpuku: å˜è¤‡ã€wakuren: æ é€£ã€umaren: é¦¬é€£ã€wide: ãƒ¯ã‚¤ãƒ‰ã€
+                umatan: é¦¬å˜ã€trio: ä¸‰é€£è¤‡ã€tirece: ä¸‰é€£å˜
+
+        '''
+        soup = self.do_action(self.ODDS_BASE_URL, cname)
+
 o = Odds()
-o.get_wakuren('pw153ou1004202303080120230903Z/F8')
+o.get_tirece('pw151ou1004202303080120230903Z/F0')
