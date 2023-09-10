@@ -99,10 +99,17 @@ class Odds(Base, DoAction):
         Returns:
             page_type(str): どの種別のページか
                 tanpuku: 単複、wakuren: 枠連、umaren: 馬連、wide: ワイド、
-                umatan: 馬単、trio: 三連複、tirece: 三連単
+                umatan: 馬単、trio: 三連複、tirece: 三連単、unknown: 不明
 
         '''
         soup = self.do_action(self.ODDS_BASE_URL, cname)
+        current_list = soup.find_all('li', class_ = 'current')
+        for current in current_list:
+            c = current.text
+            if '単勝・複勝' in c:
+                return 'tanpuku'
+            elif 'a' in c:
+                return 'unknown'
 
 o = Odds()
-o.get_tirece('pw151ou1004202303080120230903Z/F0')
+print(o.judge_page_type('pw151ou1004202303080120230903Z/F0'))
